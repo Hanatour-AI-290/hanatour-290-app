@@ -336,3 +336,78 @@ img { display: block; }
 .seg2 button.on { background: #fff; color: var(--ink); font-weight: 700; box-shadow: 0 1px 4px rgba(25, 31, 40, 0.1); }
 .smsin { height: 156px; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; font: inherit; font-size: 14px; line-height: 1.5; resize: none; outline: none; color: var(--ink); }
 .smsin:focus { border-color: var(--brand); }
+
+/* ---------- 백엔드 연동 화면 (정산방 · 지갑 · 확인 카드) ---------- */
+
+/* 지금 누구로 보기 (R-04) */
+.viewer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 2px; }
+.viewer span { font-size: 12px; color: var(--sub); font-weight: 600; white-space: nowrap; }
+.viewer div { display: flex; gap: 6px; }
+.viewer button { padding: 6px 11px; border-radius: 999px; background: #eef0f3; color: var(--sub); font-size: 12px; font-weight: 700; }
+.viewer button.on { background: var(--ink); color: #fff; }
+.viewer.dark { margin-top: 16px; }
+.viewer.dark span { color: #fff; opacity: 0.9; }
+.viewer.dark button { background: rgba(255, 255, 255, 0.22); color: #fff; }
+.viewer.dark button.on { background: #fff; color: var(--brand); }
+
+/* 정산 기준 고정 (R-06) · 확인 요청 (R-11) */
+.basis { display: inline-flex; margin-top: 12px; padding: 6px 11px; border-radius: 999px; background: rgba(255, 255, 255, 0.22); color: #fff; font-size: 12px; font-weight: 700; }
+.ask { padding: 16px 16px 14px; border: 2px solid var(--brand); }
+.ask b { font-size: 16px; font-weight: 800; }
+.ask p { margin-top: 4px; font-size: 13px; color: var(--sub); }
+.curhd { font-size: 13px; font-weight: 700; color: var(--sub); margin-top: 4px; }
+.tr small { display: block; font-size: 11px; color: var(--muted); font-weight: 500; text-align: right; }
+.ppl .fix { margin-top: 4px; font-size: 11px; font-weight: 700; color: var(--brand); }
+
+/* 가계부 상단: 하루 예산 (R-21) · 하루 끝 요약 (R-23) */
+.today .r3 { margin-top: 10px; font-size: 12px; font-weight: 600; opacity: 0.92; }
+.today .over { margin-top: 10px; padding: 7px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.22); font-size: 12px; font-weight: 800; }
+.warn { margin-top: 10px; padding: 11px 14px; border-radius: 14px; background: #fff1f0; color: #c4321c; font-size: 13px; font-weight: 700; }
+.fxl { margin-top: 6px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+/* 중복 결제 (R-14) · 영수증 줄 확인 카드 (R-10) */
+.dup { margin-top: 10px; padding: 11px 12px; border-radius: 12px; background: #fff8e1; font-size: 13px; font-weight: 600; }
+.lines { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 4px; }
+.ln { padding: 8px 0; border-bottom: 1px solid #f1f2f4; }
+.ln .t { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.ln .t span { font-weight: 800; white-space: nowrap; }
+.ln small { display: block; margin-top: 2px; font-size: 11px; color: var(--sub); }
+.ln .who { display: flex; gap: 4px; margin-top: 6px; }
+.ln .who button { padding: 4px 9px; border-radius: 999px; background: #eef0f3; font-size: 11px; font-weight: 700; color: var(--sub); }
+.ln .who button.on { background: var(--brand); color: #fff; }
+.qst { margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: #fff8e1; font-size: 12px; font-weight: 600; }
+
+/* 직접 입력 (R-17) */
+.seg2.three { grid-template-columns: repeat(3, 1fr); }
+.manual { display: flex; flex-direction: column; gap: 8px; }
+.manual input { width: 100%; margin-bottom: 0; }
+.mrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.manual select { height: 48px; border: 1.5px solid var(--line); border-radius: 14px; padding: 0 12px; font: inherit; font-size: 14px; background: #fff; color: var(--ink); }
+
+/* 내 지갑 (R-05) · 잔액 부족 (R-13) */
+.wal { padding: 18px 18px 16px; margin-top: 12px; }
+.wal .t { display: flex; justify-content: space-between; align-items: flex-end; }
+.wal .t small { display: block; font-size: 12px; color: var(--sub); font-weight: 600; }
+.wal b { display: block; margin-top: 2px; font-size: 26px; font-weight: 900; letter-spacing: -0.04em; }
+.wal .sp { display: flex; gap: 14px; margin-top: 8px; font-size: 13px; color: var(--sub); font-weight: 600; }
+.alert { margin-top: 12px; padding: 14px 16px; border-radius: 16px; background: #fff; border: 2px solid var(--brand); font-size: 14px; font-weight: 800; }
+.alert p { margin-top: 4px; font-size: 12px; color: var(--sub); font-weight: 500; line-height: 1.5; }
+.alert p b { color: var(--ink); }
+.alert .btn { height: 44px; margin-top: 10px; font-size: 14px; }
+.alert.done { border-color: var(--line); color: var(--sub); font-weight: 600; font-size: 13px; }
+.mv { display: flex; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.mv:last-child { border-bottom: 0; }
+.mv b { font-weight: 800; white-space: nowrap; }
+.mv b.plus { color: var(--green); }
+
+/* 하루 예산 (R-03) */
+.budget { margin-top: 14px; padding: 14px 16px; border-radius: 16px; background: var(--bg); }
+.budget small { font-size: 12px; color: var(--sub); font-weight: 600; }
+.budget b { display: block; margin-top: 2px; font-size: 22px; font-weight: 900; }
+.budget em { font-style: normal; font-size: 13px; margin-left: 2px; }
+.budget p { margin-top: 6px; font-size: 12px; color: var(--sub); line-height: 1.5; }
+.budget .ex { padding: 1px 6px; border-radius: 6px; background: var(--tint); color: var(--brand); font-weight: 700; }
+
+/* 탭 알림 점 (R-11, R-13) */
+.tab { position: relative; }
+.tab .dot { position: absolute; top: 2px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: 4px; background: var(--brand); }

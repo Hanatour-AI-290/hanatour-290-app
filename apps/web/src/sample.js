@@ -66,3 +66,24 @@ export const SAMPLE_SMS = `[Web발신]
 TRY 620.00
 11/05 14:10
 GOREME CAFE`
+
+// 정산방 멤버 id (API 는 이름이 아니라 id 로 계산한다)
+export const MEMBER_IDS = { 지우: 'm1', 하린: 'm2', 도윤: 'm3', 서준: 'm4' }
+export const ROOM = MEMBERS.map((name) => ({ id: MEMBER_IDS[name], name }))
+export const NAME_OF = Object.fromEntries(ROOM.map((m) => [m.id, m.name]))
+
+// 예시 일정의 날짜: DAY 1 = 2026-11-03 (튀르키예 시각 +03:00). 예시 영수증·카드 문자의 11/05 가 DAY 3
+export const TRIP_START = '2026-11-03'
+export const TRIP_TZ = '+03:00'
+
+// 하루 생활비 (R-03). 근거 데이터가 없는 예시 값이라 화면에 "예시 값" 으로 표시한다
+export const LIVING_PER_DAY_KRW = 50000
+
+// 시연 시작 시점의 지갑: 이미 환전돼 있는 상태 (R-05). 금액은 최소 단위 (TRY 8,000.00 → 800000)
+// 도윤은 카드 리라를 적게 둬서 잔액 부족 → 현금 주고받기(R-13) 를 보여 준다
+export const WALLETS = [
+  { memberId: 'm1', balances: [{ amount: 800000, currency: 'TRY', method: 'card' }, { amount: 200000, currency: 'TRY', method: 'cash' }, { amount: 60000, currency: 'EUR', method: 'card' }] },
+  { memberId: 'm2', balances: [{ amount: 600000, currency: 'TRY', method: 'card' }, { amount: 150000, currency: 'TRY', method: 'cash' }, { amount: 50000, currency: 'EUR', method: 'card' }] },
+  { memberId: 'm3', balances: [{ amount: 30000, currency: 'TRY', method: 'card' }, { amount: 300000, currency: 'TRY', method: 'cash' }, { amount: 80000, currency: 'EUR', method: 'card' }] },
+  { memberId: 'm4', balances: [{ amount: 500000, currency: 'TRY', method: 'card' }, { amount: 100000, currency: 'TRY', method: 'cash' }, { amount: 40000, currency: 'EUR', method: 'card' }] },
+]
