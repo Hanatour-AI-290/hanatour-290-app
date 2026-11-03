@@ -825,7 +825,7 @@ function Settle({ records, setRecords, go, toast, viewer, setViewer, ctx }) {
           </>
         )}
 
-        <div className="sec" style={{ margin: '28px 0 10px' }}><h2 style={{ fontSize: 15 }}>통화별 정산</h2><span>확인 끝나면 지갑에서 자동으로</span></div>
+        <div className="sec" style={{ margin: '28px 0 10px' }}><h2 style={{ fontSize: 15 }}>통화별 정산</h2></div>
         {ctx.settleErr && <div className="err">{ctx.settleErr.message}{ctx.settleErr.detail ? ` · ${[].concat(ctx.settleErr.detail).join(', ')}` : ''}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {groups.map(([cur, v]) => (

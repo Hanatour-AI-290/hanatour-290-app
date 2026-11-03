@@ -420,3 +420,7 @@ img { display: block; }
 .splitpay input:focus { border-color: var(--brand); }
 .splitpay .cap.bad { color: #c4321c; font-weight: 600; }
 .splitpay .btn { height: 44px; font-size: 14px; }
+
+/* 정산 화면: "지금 누구로 보기" 버튼과 마스코트가 겹치지 않게 */
+.settle .mas { top: 112px; width: 80px; }
+.curhd { align-self: flex-start; padding: 3px 10px; border-radius: 999px; background: #fff; box-shadow: 0 2px 8px rgba(25, 31, 40, 0.06); }
