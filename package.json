@@ -1,0 +1,25 @@
+{
+  "name": "hanatour-290-app",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n web,api -c cyan,magenta \"npm run dev -w @h290/web\" \"npm run dev -w @h290/api\"",
+    "dev:web": "npm run dev -w @h290/web",
+    "dev:api": "npm run dev -w @h290/api",
+    "build": "npm run build -w @h290/web",
+    "lint": "oxlint",
+    "test": "node --test \"apps/*/test/**/*.test.js\" \"packages/*/test/**/*.test.js\"",
+    "eval": "npm run eval -w @h290/ai"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "oxlint": "^1.91.0"
+  }
+}

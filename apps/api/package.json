@@ -1,0 +1,16 @@
+{
+  "name": "@h290/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@h290/ai": "*",
+    "@h290/shared": "*",
+    "@hono/node-server": "^2.1.6",
+    "hono": "^4.7.0"
+  }
+}

@@ -1,0 +1,25 @@
+# 의존성·빌드
+node_modules
+dist
+dist-ssr
+.vercel
+
+# 비밀값 - .env.example 만 커밋
+.env
+.env.*
+!.env.example
+*.local
+
+# 로그
+*.log
+npm-debug.log*
+
+# 편집기·OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+# AI 평가 결과(로컬 실행 산출물)
+packages/ai/eval/results/
