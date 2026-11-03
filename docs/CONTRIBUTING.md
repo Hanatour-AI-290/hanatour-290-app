@@ -2,8 +2,22 @@
 
 ## 브랜치
 
-- `main` 에 바로 push 하지 않고 PR 로만 합친다. CI(lint + test) 통과가 조건.
-- 브랜치 이름: `feat/fe-영수증화면`, `feat/be-정산api`, `feat/ai-줄단위읽기`, `fix/...`
+```
+main      ← 시연·배포용. develop 에서만 PR 로 합친다
+└ develop ← 기본 브랜치. 모든 작업 PR 은 여기로
+   ├ feat/fe-영수증화면
+   ├ feat/be-정산api
+   └ feat/ai-줄단위읽기
+```
+
+1. `git switch develop && git pull` 로 최신 develop 받기
+2. `git switch -c feat/be-정산api` 처럼 작업 브랜치 만들기
+3. 작업 → push → **develop 으로 PR** → CI(lint + test + build) 통과하면 합치기
+4. 합친 작업 브랜치는 자동으로 지워진다
+5. 시연 전처럼 안정된 시점에 `develop → main` PR (Merge commit 으로 합치기)
+
+브랜치 이름: `feat/fe-*`, `feat/be-*`, `feat/ai-*`, `fix/*`, `docs/*`, `chore/*`
+main · develop 에는 바로 push 할 수 없다.
 
 ## 커밋 메시지
 
