@@ -1,11 +1,13 @@
 // POST /api/estimate  { text } → { title, base_price_krw, items[], fx }   (R-01)
 import { Hono } from 'hono'
+import { upstream } from '../lib/upstream.js'
 import { estimate } from '@h290/ai'
 import { rates } from '../lib/fx.js'
 
 const r = new Hono()
 
-r.post('/', async (c) => {
+// 로컬에 키가 없으면 배포본으로 넘김 (lib/upstream.js)
+r.post('/', upstream('/estimate'), async (c) => {
   const body = await c.req.json().catch(() => ({}))
   const text = String(body?.text ?? '').trim()
   if (text.length < 10) return c.json({ error: '상품 문구를 조금 더 붙여 넣어 주세요' }, 400)

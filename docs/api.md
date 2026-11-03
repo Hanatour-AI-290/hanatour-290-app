@@ -51,6 +51,10 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 | 줄 `kind`       | `item` 메뉴 (기본) · `tax` 세금 (배정하지 않고 몫 비율대로 나눔)   |
 | 확인 `status`   | `pending` 확인 전 (기본) · `confirmed` 맞아요 · `declined` 안 갔어요 |
 
+## 로컬에 AI 키가 없을 때
+
+`.env` 에 `ANTHROPIC_API_KEY` 가 비어 있고 `AI_UPSTREAM`(예: `https://hanatour-290.vercel.app/api`)이 있으면, `/estimate` · `/record` 요청을 그 주소로 그대로 넘긴다 (`apps/api/src/lib/upstream.js`). 키가 있으면 넘기지 않는다. 영수증 줄 단위 분석은 넘기지 않는다 (배포본에 아직 없음).
+
 ## POST /estimate
 
 요청 `{ "text": "상품 문구 (10~8000자)" }`

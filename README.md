@@ -19,7 +19,7 @@ Node 22 이상이 필요해요.
 
 ```bash
 npm install
-cp .env.example .env     # ANTHROPIC_API_KEY 채우기
+cp .env.example .env     # ANTHROPIC_API_KEY 채우기 (없으면 AI_UPSTREAM 에 배포본 API 주소)
 npm run dev              # web http://localhost:5173 · api http://localhost:8787/api/health
 ```
 
