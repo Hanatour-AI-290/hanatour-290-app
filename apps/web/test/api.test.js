@@ -49,3 +49,22 @@ test('정산에 못 넣는 기록은 null (안 함 · 금액 미정 · 확인 �
 test('확인 요청은 결제자를 뺀 사람에게만', () => {
   assert.deepEqual(confirmFor(['지우', '하린', '도윤'], '지우'), { 하린: 'pending', 도윤: 'pending' })
 })
+
+test('여러 명이 나눠 냄 (R-08): 합이 총액과 같을 때만 쓰고, 확인은 결제자 모두를 뺀다', () => {
+  const r = { ...base, amount: 3560, currency: 'TRY', payer: '지우', people: ['지우', '하린', '도윤'], payers: [{ name: '지우', amount: 2000 }, { name: '하린', amount: 1560 }] }
+  const e = toExpense(r, fxOf, 3)
+  assert.deepEqual(e.payers, [{ memberId: 'm1', amount: 200000, method: 'card' }, { memberId: 'm2', amount: 156000, method: 'card' }])
+  assert.ok(Expense.safeParse(e).success)
+  // 합이 다르면 한 명이 낸 것으로 (서버 검사에 걸리지 않게)
+  const bad = toExpense({ ...r, payers: [{ name: '지우', amount: 2000 }, { name: '하린', amount: 1000 }] }, fxOf, 3)
+  assert.deepEqual(bad.payers, [{ memberId: 'm1', amount: 356000, method: 'card' }])
+  assert.deepEqual(confirmFor(['지우', '하린', '도윤'], ['지우', '하린'], { 도윤: 'confirmed' }), { 도윤: 'confirmed' })
+})
+
+test('영수증 줄 합 ≠ 총액이면 차액 줄을 넣어 서버 검사를 통과한다', () => {
+  const lines = [{ name: 'A', kind: 'item', qty: 1, unitPrice: 300000, total: 300000 }, { name: 'B', kind: 'item', qty: 1, unitPrice: 40000, total: 40000 }]
+  const e = toExpense({ ...base, src: '영수증', amount: 3560, currency: 'TRY', payer: '지우', people: ['지우', '하린'], lines, splits: [] }, fxOf, 3)
+  assert.equal(e.lines.length, 3)
+  assert.deepEqual(e.lines[2], { name: '읽지 못한 차액', kind: 'tax', qty: 1, unitPrice: 16000, total: 16000 })
+  assert.equal(e.lines.reduce((a, l) => a + l.total, 0), e.total.amount)
+})

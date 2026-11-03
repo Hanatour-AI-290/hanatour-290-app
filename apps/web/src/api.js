@@ -54,10 +54,21 @@ export function toExpense(r, fxOf, today) {
   const unit = toMinor(r.amount, cur)
   const total = r.perPerson ? unit * ids.length : unit
   const method = r.method ?? 'card'
+  // 결제자가 여러 명 (R-08): r.payers = [{ name, amount(소수), method }]. 합이 총액과 다르면 쓰지 않는다
+  const split = (r.payers ?? []).map((p) => ({ memberId: MEMBER_IDS[p.name], amount: toMinor(p.amount, cur), method: p.method ?? method }))
+  const splitOk = split.length > 1 && split.every((p) => p.memberId) && split.reduce((a, p) => a + p.amount, 0) === total
   // 결제자가 없는 일정 항목("각자 냄")은 각자 자기 몫을 낸 것으로 본다
-  const payers = !r.payer && r.perPerson
-    ? ids.map((id) => ({ memberId: id, amount: unit, method }))
-    : [{ memberId: MEMBER_IDS[r.payer ?? ME], amount: total, method }]
+  const payers = splitOk
+    ? split
+    : !r.payer && r.perPerson
+      ? ids.map((id) => ({ memberId: id, amount: unit, method }))
+      : [{ memberId: MEMBER_IDS[r.payer ?? ME], amount: total, method }]
+
+  // AI 가 읽은 줄 합이 총액과 다르면 (확인 카드에 이미 알려 줌) 차액을 "몫 비율대로 나누는 줄" 로 넣는다.
+  // 그래야 서버 검사(줄 합 = 총액)를 통과하고, 영수증 총액 그대로 정산된다
+  let lines = r.lines ?? []
+  const diff = lines.length ? total - lines.reduce((a, l) => a + l.total, 0) : 0
+  if (diff) lines = [...lines, { name: '읽지 못한 차액', kind: 'tax', qty: 1, unitPrice: diff, total: diff }]
 
   const paidAt = paidAtOf(r, today)
   const fx = cur === 'KRW' ? undefined : fxOf(cur, paidAt.slice(0, 10)) ?? undefined
@@ -66,7 +77,7 @@ export function toExpense(r, fxOf, today) {
     tripId: 't1',
     payers,
     total: { amount: total, currency: cur },
-    lines: r.lines ?? [],
+    lines,
     splits: r.splits ?? [],
     memberIds: ids,
     confirmations: Object.entries(r.confirm ?? {})
@@ -81,10 +92,19 @@ export function toExpense(r, fxOf, today) {
   }
 }
 
-/** 같이 쓴 돈으로 기록하면, 결제자 말고 나눌 사람에게 "맞아요 / 안 갔어요" 확인을 건다 (R-11) */
-export function confirmFor(people, payer) {
-  return Object.fromEntries(people.filter((p) => p !== payer).map((p) => [p, 'pending']))
+/**
+ * 같이 쓴 돈으로 기록하면, 결제자 말고 나눌 사람에게 "맞아요 / 안 갔어요" 확인을 건다 (R-11).
+ * @param {string[]} people 나눌 사람
+ * @param {string | string[]} payer 결제자 이름 (여러 명이면 배열)
+ * @param {Record<string, string>} [prev] 이미 답한 확인은 그대로 둔다
+ */
+export function confirmFor(people, payer, prev = {}) {
+  const payers = [].concat(payer)
+  return Object.fromEntries(people.filter((p) => !payers.includes(p)).map((p) => [p, prev[p] ?? 'pending']))
 }
+
+/** 결제자 이름들 (여러 명이 나눠 냈으면 모두) */
+export const payerNames = (r) => (r.payers?.length > 1 ? r.payers.map((p) => p.name) : r.payer ? [r.payer] : [])
 
 /* ---------- API 호출 ---------- */
 

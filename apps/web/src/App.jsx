@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { SAMPLE, SAMPLE_RESULT, SAMPLE_SMS, ME, MEMBERS, TRIP, SEED, MEMBER_IDS, ROOM, NAME_OF, WALLETS, LIVING_PER_DAY_KRW } from './sample.js'
-import { confirmFor, dayDate, fromMinor, paidAtOf, postForm, postJson, toExpense, useFx, usePost } from './api.js'
+import { confirmFor, dayDate, fromMinor, paidAtOf, payerNames, postForm, postJson, toExpense, toMinor, useFx, usePost } from './api.js'
 
 const PATH = {
   home: 'M4 10.5 12 4l8 6.5V20h-5.5v-6h-5v6H4z',
@@ -398,6 +398,11 @@ function LinesCard({ r, update }) {
         )
       })}
       {(r.questions ?? []).map((q, k) => <div className="qst" key={k}>확인해 주세요 · {q.text}</div>)}
+      {(() => {
+        // 줄 합 ≠ 총액이면 확정 전에 알려 준다 (확정하면 차액은 몫 비율대로, api.js toExpense)
+        const diff = toMinor(r.amount, r.currency) - r.lines.reduce((a, l) => a + l.total, 0)
+        return diff ? <div className="qst">줄 합계가 총액과 {fmtMinor(Math.abs(diff), r.currency)} 달라요 · 이대로 확정하면 차액은 각자 몫 비율대로 나눠요</div> : null
+      })()}
       {r.status === 'review' && (
         <div className="yn">
           <button onClick={() => update(r.id, { status: 'done' })}>맞아요</button>
@@ -627,7 +632,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
                       <b>{r.name}</b>
                       <small>
                         {r.category}{off ? (r.status === 'done' ? ' · 예산 밖 지출' : ' · 예산에 안 넣음') : ''}
-                        {r.status === 'done' && (r.payer ? ` · ${r.payer} 결제 · ${r.people.length}명` : ' · 각자 냄')}
+                        {r.status === 'done' && (r.payer ? ` · ${payerNames(r).join('·')} 결제 · ${r.people.length}명` : ' · 각자 냄')}
                         {r.status === 'done' && r.method === 'cash' && ' · 현금'}
                         {r.status === 'done' && asks.length > 0 && (waiting ? ` · 확인 대기 ${waiting}명` : ' · 확인 끝')}
                         {r.status === 'done' && out > 0 && ` · ${out}명 빠짐`}
@@ -739,6 +744,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
 function Settle({ records, setRecords, go, toast, viewer, setViewer, ctx }) {
   const s = ctx.settle
   const [editing, setEditing] = useState(null)
+  const [payDraft, setPayDraft] = useState(null) // 여러 명이 나눠 낸 금액 입력 중 { id, rows: { 이름: '금액' } }
   const list = records.filter((r) => r.status === 'done' && r.payer && r.amount != null && r.currency)
   const asks = list.filter((r) => r.confirm?.[viewer] === 'pending')
   const update = (id, patch) => setRecords((rs) => rs.map((r) => (r.id === id ? { ...r, ...patch } : r)))
@@ -748,25 +754,43 @@ function Settle({ records, setRecords, go, toast, viewer, setViewer, ctx }) {
     update(r.id, { confirm: { ...r.confirm, [viewer]: status } })
     toast(status === 'declined' ? `${viewer}${eul(viewer)} 빼고 남은 사람끼리 다시 나눴어요` : '확인했어요')
   }
-  const setPayer = (r, p) =>
-    update(r.id, { payer: p, confirm: Object.fromEntries(r.people.filter((x) => x !== p).map((x) => [x, r.confirm?.[x] ?? 'pending'])) })
+  const setPayer = (r, p) => update(r.id, { payer: p, payers: undefined, confirm: confirmFor(r.people, p, r.confirm) })
+
+  // 결제자가 여러 명 (R-08): 각자 낸 금액의 합이 총액과 같아야 저장된다
+  function openSplitPay(r) {
+    const now = r.payers?.length > 1 ? r.payers : [{ name: r.payer, amount: totalOf(r) }]
+    setPayDraft({ id: r.id, rows: Object.fromEntries(now.map((p) => [p.name, String(p.amount)])) })
+  }
+  function saveSplitPay(r) {
+    const rows = MEMBERS.filter((m) => Number(payDraft.rows[m]) > 0).map((m) => ({ name: m, amount: Number(payDraft.rows[m]), method: r.method ?? 'card' }))
+    const names = rows.map((p) => p.name)
+    update(r.id, { payer: names[0], payers: rows.length > 1 ? rows : undefined, confirm: confirmFor(r.people, names, r.confirm) })
+    setPayDraft(null)
+    toast(rows.length > 1 ? `${names.join('·')} 나눠 낸 걸로 바꿨어요` : `${names[0]}${iGa(names[0])} 낸 걸로 바꿨어요`)
+  }
   function togglePerson(r, p) {
     const has = r.people.includes(p)
     if (has && r.people.length === 1) return
     const people = has ? r.people.filter((x) => x !== p) : [...r.people, p]
     const confirm = { ...r.confirm }
     if (has) delete confirm[p]
-    else if (p !== r.payer) confirm[p] = 'pending'
+    else if (!payerNames(r).includes(p)) confirm[p] = 'pending'
     update(r.id, { people, confirm })
   }
   // 금액을 고치면 고친 기록을 남긴다 (R-14)
+  // 줄 단위 영수증의 총액을 고치면 줄과 맞지 않으므로 줄 배정은 지우고 나눌 사람끼리 1/N 로 바꾼다. 나눠 낸 금액도 다시 정한다
   function fixAmount(r, amount, currency) {
-    update(r.id, { amount, currency, edits: [...(r.edits ?? []), { at: new Date().toISOString(), from: money(r.amount, r.currency), to: money(amount, currency) }] })
+    const note = r.lines ? ' (줄 배정 지우고 1/N)' : ''
+    update(r.id, {
+      amount, currency, payers: undefined,
+      ...(r.lines ? { lines: undefined, splits: undefined, questions: undefined } : {}),
+      edits: [...(r.edits ?? []), { at: new Date().toISOString(), from: money(totalOf(r), r.currency), to: `${money(amount, currency)}${note}` }],
+    })
     setEditing(null)
   }
   const stateOf = (r, x) => {
     if (!r.people.includes(x)) return '안 함'
-    if (r.payer === x) return '결제'
+    if (payerNames(r).includes(x)) return '결제'
     return { confirmed: '확인', declined: '안 감', pending: '확인 전' }[r.confirm?.[x]] ?? '참여'
   }
 
@@ -838,11 +862,30 @@ function Settle({ records, setRecords, go, toast, viewer, setViewer, ctx }) {
                   </div>
                 </div>
                 {editing === r.id && <AmountInput onSave={(amount, currency) => fixAmount(r, amount, currency)} />}
-                {(r.edits ?? []).map((e) => <div className="fxl" key={e.at}>고친 기록 · {e.from} → {e.to} ({e.at.slice(5, 16).replace('T', ' ')})</div>)}
+                {(r.edits ?? []).map((e) => <div className="fxl" key={e.at}>고친 기록 · {e.from} → {e.to} ({new Date(e.at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })})</div>)}
                 <div className="payrow">
                   <span>결제</span>
-                  {MEMBERS.map((m) => <button key={m} className={r.payer === m ? 'on' : ''} onClick={() => setPayer(r, m)}>{m}</button>)}
+                  {MEMBERS.map((m) => <button key={m} className={payerNames(r).includes(m) ? 'on' : ''} onClick={() => setPayer(r, m)}>{m}</button>)}
                 </div>
+                {r.payers?.length > 1 && <div className="fxl">{r.payers.map((p) => `${p.name} ${money(p.amount, r.currency)}`).join(' · ')} 나눠 냄</div>}
+                <button className="fix" onClick={() => (payDraft?.id === r.id ? setPayDraft(null) : openSplitPay(r))}>{payDraft?.id === r.id ? '닫기' : '여러 명이 나눠 냈어요'}</button>
+                {payDraft?.id === r.id && (() => {
+                  const sum = MEMBERS.reduce((a, m) => a + toMinor(Number(payDraft.rows[m]) || 0, r.currency), 0)
+                  const total = toMinor(totalOf(r), r.currency)
+                  return (
+                    <div className="splitpay">
+                      {MEMBERS.map((m) => (
+                        <label key={m}>
+                          <span>{m}</span>
+                          <input inputMode="decimal" placeholder="0" value={payDraft.rows[m] ?? ''}
+                            onChange={(e) => setPayDraft((d) => ({ ...d, rows: { ...d.rows, [m]: e.target.value.replace(/[^\d.]/g, '') } }))} />
+                        </label>
+                      ))}
+                      <div className={`cap ${sum === total ? '' : 'bad'}`}>낸 돈 합계 {fmtMinor(sum, r.currency)} / 총액 {fmtMinor(total, r.currency)}{sum === total ? '' : ' · 합이 같아야 저장돼요'}</div>
+                      <button className="btn brand" disabled={sum !== total || sum === 0} onClick={() => saveSplitPay(r)}>저장</button>
+                    </div>
+                  )
+                })()}
                 <div className="pgrid">
                   {MEMBERS.map((x) => {
                     const on = r.people.includes(x) && r.confirm?.[x] !== 'declined'

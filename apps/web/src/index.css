@@ -411,3 +411,12 @@ img { display: block; }
 /* 탭 알림 점 (R-11, R-13) */
 .tab { position: relative; }
 .tab .dot { position: absolute; top: 2px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: 4px; background: var(--brand); }
+
+/* 결제자 여러 명 (R-08) */
+.ppl > .fix { display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--brand); }
+.splitpay { margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--bg); display: flex; flex-direction: column; gap: 8px; }
+.splitpay label { display: grid; grid-template-columns: 48px 1fr; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; }
+.splitpay input { height: 40px; border: 1.5px solid var(--line); border-radius: 10px; padding: 0 12px; font: inherit; font-size: 14px; background: #fff; outline: none; }
+.splitpay input:focus { border-color: var(--brand); }
+.splitpay .cap.bad { color: #c4321c; font-weight: 600; }
+.splitpay .btn { height: 44px; font-size: 14px; }

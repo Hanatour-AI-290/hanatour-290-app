@@ -35,3 +35,12 @@ test('배정이 틀리고 질문도 없으면 잡아내지 못한 것', () => {
   assert.equal(s.caught, 0)
   assert.equal(s.avgSeconds, 4)
 })
+
+test('검사 오류를 사람이 읽는 금액으로 바꾼다 (재시도 힌트 · 질문)', async () => {
+  const { explain } = await import('../src/pipeline.js')
+  const receipt = { currency: 'TRY', total: 356000, lines: [{ total: 260000 }, { total: 80000 }] }
+  const { hints, questions } = explain(receipt, ['줄 합계 340000 ≠ 영수증 합계 356000'])
+  assert.match(hints[0], /3,400 TRY.*3,560 TRY/)
+  assert.match(questions[0].text, /3,400 TRY.*3,560 TRY/)
+  assert.equal(explain(receipt, []).questions.length, 0)
+})
