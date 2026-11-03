@@ -39,6 +39,8 @@ app.onError((e, c) => {
   console.error(e)
   if (e instanceof Anthropic.RateLimitError) return c.json({ error: '요청이 많습니다. 잠시 후 다시 시도해 주세요' }, 429)
   // 작업공간 사용 한도 초과 (2026-11-04 해커톤 키에서 실제로 발생) → 화면은 직접 입력으로 넘긴다
+  // .env 에 ANTHROPIC_API_KEY 가 없을 때 (packages/ai/src/client.js) → 화면은 직접 입력으로 넘긴다
+  if (/ANTHROPIC_API_KEY/.test(e.message)) return c.json({ error: 'AI 키가 설정되지 않았어요' }, 503)
   if (e instanceof Anthropic.APIError && /usage limits/i.test(e.message)) return c.json({ error: 'AI 사용 한도를 넘었어요' }, 503)
   if (e instanceof Anthropic.APIError) return c.json({ error: `AI 호출 실패 (${e.status})` }, 502)
   return c.json({ error: '서버 오류' }, 500)
