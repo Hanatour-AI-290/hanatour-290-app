@@ -30,6 +30,22 @@ npm run dev              # web http://localhost:5173 · api http://localhost:878
 | `npm test`      | 테스트 (node:test)              |
 | `npm run eval`  | AI 평가 세트 정확도             |
 
+## 지금 되는 것 (프로토타입에서 옮김)
+
+| 화면·기능 | 코드 | 요구사항 |
+| --- | --- | --- |
+| 스플래시 · 홈 · 문구 입력 · 결과 · 가계부 · 정산 · 리포트 화면 | `apps/web/src/App.jsx`, 예시 데이터 `sample.js` | R-02, R-04, R-22 등 |
+| 상품 문구 → 따로 내는 비용 + 환율 | `packages/ai/src/estimate.js`, `apps/api/src/routes/estimate.js` | R-01 |
+| 영수증 · 카드 문자 · 말 → 지출 하나, 자동 분류 | `packages/ai/src/record.js`, `apps/api/src/routes/record.js` | R-15, R-16, R-18 |
+| 환율 (유럽중앙은행 최신, 4개 통화) | `apps/api/src/lib/fx.js` | R-20 일부 |
+
+정산 계산(`balances`·`myShare`)은 아직 `App.jsx` 안에 있다 → `packages/shared` 로 옮기는 게 R-24.
+
+## 실시간으로 보기
+
+- `npm run dev` 터미널에 API 요청마다 `→ POST /api/record`, `← 200 2.77s {...응답 요약}` 이 찍힌다. `.env` 에 `LOG_LEVEL=debug` 면 응답 전체.
+- api 코드는 저장하면 바로 재시작, 화면은 바로 새로 고쳐진다.
+
 ## 협업
 
 [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) - 브랜치, 커밋, PR 규칙
