@@ -431,7 +431,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
   const vid = MEMBER_IDS[viewer]
   const today = day || TRIP.today
   const summary = usePost('/api/settle/day', ctx.walletRes
-    ? { members: ROOM, memberId: vid, expenses: ctx.expenses, wallets: ctx.walletRes.wallets, date: dayDate(today), day: today, days: TRIP.days }
+    ? { members: ROOM, memberId: vid, expenses: ctx.expenses, wallets: ctx.walletRes.wallets, date: dayDate(today), day: Math.min(today, ctx.days), days: ctx.days }
     : null).data
   const spent = summary?.todayKrw ?? 0
   const perDay = ctx.budget?.perDayKrw ?? 0
@@ -610,7 +610,9 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
         <div className="sched">
           {list.length === 0 && <div className="card sitem none">이날은 따로 낼 돈이 없어요 · 식사·이동은 상품가에 포함</div>}
           {list.map((r) => {
-            const k = toKrw(r.amount, r.currency, data.fx)
+            // 원화 표시: 했다고 기록한 건 결제일 환율, 아직 안 한 일정은 상품 분석 때 환율
+            const fxr = r.status === 'done' && r.currency && r.currency !== 'KRW' ? ctx.fxOf(r.currency, paidAtOf(r, TRIP.today).slice(0, 10)) : null
+            const k = fxr && r.amount != null ? r.amount * fxr.rate : toKrw(r.amount, r.currency, data.fx)
             const off = r.src === '일정' && !planned(r)
             const dim = off && r.status !== 'done'
             const asks = Object.values(r.confirm ?? {})
@@ -1064,6 +1066,7 @@ export default function App() {
     settle: settleQ.data, settleErr: settleQ.error,
     walletRes: walletQ.data, walletErr: walletQ.error,
     budget: budgetQ.data,
+    days: days ?? TRIP.days, // 상품 일정 일수 (모르면 예시 일정 9일)
   }
 
   const vid = MEMBER_IDS[viewer]

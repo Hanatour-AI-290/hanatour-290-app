@@ -79,3 +79,19 @@ test('receipts/analyze: 입력이 틀리면 AI 를 부르기 전에 400', async 
   noMembers.set('image', new File([new Uint8Array([0xff, 0xd8, 0xff])], 'r.jpg', { type: 'image/jpeg' }))
   assert.equal((await send(noMembers)).status, 400)
 })
+
+test('배포본 넘기기: 키가 없고 AI_UPSTREAM 이 자기 자신이면 503 (무한 반복 방지)', async () => {
+  const names = ['ANTHROPIC_API_KEY', 'AI_UPSTREAM']
+  const saved = Object.fromEntries(names.map((n) => [n, process.env[n]]))
+  delete process.env[names[0]]
+  process.env[names[1]] = 'http://localhost/api'
+  try {
+    const res = await post('/api/record', { text: '기념품 300리라', members: ['지우'] })
+    assert.equal(res.status, 503)
+  } finally {
+    for (const n of names) {
+      if (saved[n] === undefined) delete process.env[n]
+      else process.env[n] = saved[n]
+    }
+  }
+})

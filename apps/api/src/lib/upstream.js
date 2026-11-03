@@ -10,6 +10,8 @@ export function upstream(path) {
   return async (c, next) => {
     const base = process.env.AI_UPSTREAM
     if (process.env.ANTHROPIC_API_KEY || !base) return next()
+    // 배포본 자신에게 넘기면 끝없이 돌기 때문에 막는다 (Vercel 에 AI_UPSTREAM 을 잘못 넣은 경우)
+    if (new URL(base).host === new URL(c.req.url).host) return c.json({ error: 'AI 키가 설정되지 않았어요' }, 503)
     try {
       const res = await fetch(`${base.replace(/\/$/, '')}${path}`, {
         method: 'POST',
