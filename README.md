@@ -50,7 +50,7 @@ npm run dev              # web http://localhost:5173 · api http://localhost:878
 | 하루 예산 `POST /api/budget` · 예상 vs 실제 `POST /api/report` | `packages/shared/src/budget.js` | R-03, R-22 |
 | 영수증 분석 받는 쪽 `POST /api/trips/:tripId/receipts/analyze` (AI 구현 전까지 501) | `apps/api/src/routes/receipts.js` | R-07~R-09 |
 
-화면은 이 API 들로 계산한다 (`apps/web/src/api.js`). 정산 · 지갑 · 리포트 탭과 "지금 누구로 보기" 로 시연 시나리오 1·3·5·7 을 AI 없이도 보여 줄 수 있다. 진행 상황은 [docs/진행보고서_2026-11-04.md](docs/진행보고서_2026-11-04.md).
+화면은 이 API 들로 계산한다 (`apps/web/src/api.js`). 정산 · 지갑 · 리포트 탭과 "지금 누구로 보기" 로 시연 시나리오 1·3·5·7 을 AI 없이도 보여 줄 수 있다. 진행 상황은 [docs/진행보고서/2026-11-04.md](docs/진행보고서/2026-11-04.md).
 
 ## 실시간으로 보기
 
