@@ -11,7 +11,8 @@
     "eval:match": "node eval/match/run.js",
     "eval:match:names": "node --env-file-if-exists=../../.env eval/match/names.js",
     "eval:match:aliases": "node --env-file-if-exists=../../.env eval/match/aliases.js",
-    "eval:match:prepare": "node --env-file-if-exists=../../.env eval/match/prepare.js"
+    "eval:match:prepare": "node --env-file-if-exists=../../.env eval/match/prepare.js",
+    "eval:sentences": "node --env-file-if-exists=../../.env eval/sentences.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

@@ -17,7 +17,8 @@
     "lint": "oxlint",
     "test": "node --test \"apps/*/test/**/*.test.js\" \"packages/*/test/**/*.test.js\"",
     "eval": "npm run eval -w @h290/ai",
-    "eval:match": "npm run eval:match -w @h290/ai --"
+    "eval:match": "npm run eval:match -w @h290/ai --",
+    "eval:sentences": "npm run eval:sentences -w @h290/ai"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
