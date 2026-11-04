@@ -103,6 +103,7 @@ export function sampleReceiptResult(utterance) {
     receipt: {
       merchant: 'MAĞARA RESTORAN',
       paidAt: '2026-11-05T19:42',
+      category: '식사',
       currency: 'TRY',
       total: 356000,
       lines: [

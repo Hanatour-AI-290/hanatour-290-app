@@ -520,7 +520,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
     const people = involvedOf(out.receipt.lines, out.splits, [...MEMBERS])
     addRecord({
       id: `r${Date.now()}`, src: '영수증', day, time: out.receipt.paidAt?.slice(11, 16) || nowHHMM(),
-      name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: '식사',
+      name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: out.receipt.category ?? '식사',
       amount: fromMinor(out.receipt.total, cur), currency: cur, perPerson: false, required: false,
       status: 'review', payer, people, evidence: `${out.saved ? '저장된 분석 결과 · ' : ''}${text || '말 없이 영수증만'}`,
       lines: out.receipt.lines, splits: out.splits, questions: out.questions,

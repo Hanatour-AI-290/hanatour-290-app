@@ -343,7 +343,7 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 
 요청 (multipart): `image` 파일 (jpg · png · webp · gif, 3MB 이하), `utterance` 문자열 (500자 이하), `members` JSON 문자열 `[{"id":"m1","name":"지우"}, ...]`, `me` 올린 사람 이름 (선택, 기본 첫 멤버)
 
-응답에는 아래 예시 외에 `payerId`(말에서 찾은 결제자 id, 없으면 null)와 `retried`(다시 읽었는지)가 더 붙는다. `receipt` 에는 `merchant` · `paidAt` 도 있다.
+응답에는 아래 예시 외에 `payerId`(말에서 찾은 결제자 id, 없으면 null)와 `retried`(다시 읽었는지)가 더 붙는다. `receipt` 에는 `merchant` · `paidAt` · `category`(식사·선택관광·교통·쇼핑·팁·기타, FR-018) 도 있다.
 
 응답 예시:
 
