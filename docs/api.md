@@ -1,6 +1,6 @@
 # API 계약
 
-기본 주소: `http://localhost:8787/api` (배포: `https://hanatour-290.vercel.app/api`) · 데이터 형식은 `packages/shared/src/schemas.js` 기준.
+기본 주소: `http://localhost:8787/api` (배포: `https://hanatour-290-app.vercel.app/api`) · 데이터 형식은 `packages/shared/src/schemas.js` 기준.
 금액은 최소 단위 정수 (EUR 12.30 → `1230`, TRY 600.00 → `60000`, KRW 5,000 → `5000`).
 괄호 안 R-xx · FR-xxx 는 요구사항 정의서 번호 (FR-001 = R-01).
 
@@ -63,7 +63,7 @@ QR 로 공개한 링크에서 API 키 비용이 커지지 않게 접속 기기(I
 
 ## 로컬에 AI 키가 없을 때
 
-`.env` 에 `ANTHROPIC_API_KEY` 가 비어 있고 `AI_UPSTREAM`(예: `https://hanatour-290.vercel.app/api`)이 있으면, `/estimate` · `/record` 요청을 그 주소로 그대로 넘긴다 (`apps/api/src/lib/upstream.js`). 키가 있으면 넘기지 않는다. 영수증 줄 단위 분석은 넘기지 않는다 (배포본에 아직 없음).
+`.env` 에 `ANTHROPIC_API_KEY` 가 비어 있고 `AI_UPSTREAM`(예: `https://hanatour-290-app.vercel.app/api`)이 있으면, `/estimate` · `/record` 요청을 그 주소로 그대로 넘긴다 (`apps/api/src/lib/upstream.js`). 키가 있으면 넘기지 않는다. 영수증 줄 단위 분석은 넘기지 않는다 (배포본에 아직 없음).
 
 ## POST /estimate
 
