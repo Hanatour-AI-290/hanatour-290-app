@@ -16,6 +16,7 @@ import Product from './screens/S0_1Product.jsx'
 import Estimate from './screens/S0_2Estimate.jsx'
 import Home from './screens/SHome.jsx'
 import { TRIP5 } from './demo.js'
+import { getJson } from './api.js'
 
 // 시연 순서. id = Figma 화면 번호, who = 이 화면이 누구 폰인지
 // Figma 프로토타입(11/5) 흐름: 여행 전 준비(상품 → 총비용 → 생활비) → 친구 초대 → 홈. 여행 중에는 홈에서 각 화면으로 간다
@@ -41,7 +42,7 @@ const INDEX = Object.fromEntries(STEPS.map((s, i) => [s.id, i]))
 // 하단 탭 → 화면
 const TAB_STEP = { trip: 'home', room: '7', ledger: '10' }
 
-const INIT = { daily: TRIP5.dailyLira, estimate: null, dinner: null, solo: null, topup: null }
+const INIT = { daily: TRIP5.dailyLira, estimate: null, dinner: null, solo: null, topup: null, planDone: [] }
 
 // 시연 상태(정한 생활비 · 기록)는 새로고침해도 남도록 localStorage 에 (저장이 막힌 브라우저에서는 메모리로)
 function useStored(key, init, store = 'localStorage') {
@@ -81,6 +82,8 @@ export default function App() {
   const { id, C, title, who } = STEPS[i]
 
   useEffect(() => { if (!msg) return; const t = setTimeout(() => setMsg(''), 1800); return () => clearTimeout(t) }, [msg])
+  // 기록 ↔ 일정 연결에 쓰는 임베딩 모델을 앱을 열 때 미리 불러 둔다 (서버 첫 호출이 6초쯤 걸려서). 실패해도 그만
+  useEffect(() => { getJson('/api/match/warm').catch(() => {}) }, [])
 
   // 앞으로 가면 지금 화면을 기록에 쌓고, 뒤로 가면 기록에서 꺼낸다 (Figma 프로토타입의 Back 과 같다)
   const push = (k) => { if (k === i) return; setBack(false); setNav((n) => ({ pos: STEPS[k].id, stack: [...n.stack, n.pos].slice(-30) })) }
