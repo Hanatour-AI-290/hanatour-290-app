@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { SAMPLE, SAMPLE_RESULT, SAMPLE_SMS, ME, MEMBERS, TRIP, SEED, MEMBER_IDS, ROOM, NAME_OF, WALLETS, LIVING_PER_DAY_KRW } from './sample.js'
+import { SAMPLE, SAMPLE_RESULT, SAMPLE_SMS, ME, MEMBERS, TRIP, SEED, MEMBER_IDS, ROOM, NAME_OF, WALLETS, LIVING_PER_DAY_KRW, SAMPLE_RECEIPT_UTTERANCE, sampleReceiptResult } from './sample.js'
 import { confirmFor, dayDate, fromMinor, paidAtOf, payerNames, postForm, postJson, toExpense, toMinor, useFx, usePost } from './api.js'
 
 const PATH = {
@@ -513,8 +513,25 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
     addFrom({ text: t }, '음성')
   }
 
+  // 줄 단위 분석 결과(/receipts/analyze 응답 모양) → 확인 카드
+  function addReceipt(out, text) {
+    const cur = out.receipt.currency
+    const payer = NAME_OF[out.payerId] ?? viewer
+    const people = involvedOf(out.receipt.lines, out.splits, [...MEMBERS])
+    addRecord({
+      id: `r${Date.now()}`, src: '영수증', day, time: out.receipt.paidAt?.slice(11, 16) || nowHHMM(),
+      name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: '식사',
+      amount: fromMinor(out.receipt.total, cur), currency: cur, perPerson: false, required: false,
+      status: 'review', payer, people, evidence: `${out.saved ? '저장된 분석 결과 · ' : ''}${text || '말 없이 영수증만'}`,
+      lines: out.receipt.lines, splits: out.splits, questions: out.questions,
+      method: 'card', confirm: confirmFor(people, payer),
+    })
+    toast(out.saved ? '인터넷이 안 돼서 저장된 분석 결과로 보여 줘요' : '줄마다 누가 낼지 확인해 주세요')
+  }
+
   // 영수증 사진 + 덧붙인 말 → 줄 단위 읽기 · 줄별 배정 (R-07, R-08). 안 되면 합계만 읽기 → 직접 입력
-  async function sendPhoto(blob) {
+  // sample = 예시 영수증이면 실패해도 저장된 결과로 이어 간다 (시연이 멈추지 않게)
+  async function sendPhoto(blob, sample = false) {
     setSheet(false)
     let image
     try {
@@ -533,22 +550,12 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
       form.set('members', JSON.stringify(ROOM))
       form.set('me', viewer)
       const out = await postForm('/api/trips/t1/receipts/analyze', form)
-      const cur = out.receipt.currency
-      const payer = NAME_OF[out.payerId] ?? viewer
-      const people = involvedOf(out.receipt.lines, out.splits, [...MEMBERS])
       setBusy('')
-      addRecord({
-        id: `r${Date.now()}`, src: '영수증', day, time: out.receipt.paidAt?.slice(11, 16) || nowHHMM(),
-        name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: '식사',
-        amount: fromMinor(out.receipt.total, cur), currency: cur, perPerson: false, required: false,
-        status: 'review', payer, people, evidence: text || '말 없이 영수증만',
-        lines: out.receipt.lines, splits: out.splits, questions: out.questions,
-        method: 'card', confirm: confirmFor(people, payer),
-      })
-      toast('줄마다 누가 낼지 확인해 주세요')
+      addReceipt(out, text)
     } catch {
       setBusy('')
-      addFrom({ image, text }, '영수증')
+      if (sample) addReceipt(sampleReceiptResult(text), text)
+      else addFrom({ image, text }, '영수증')
     }
   }
 
@@ -578,7 +585,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
 
   async function sampleReceipt() {
     const b = await fetch('/img/receipt-sample.jpg').then((r) => r.blob())
-    sendPhoto(b)
+    sendPhoto(b, true)
   }
 
   const badge = (src) => ({ 영수증: 'rc', '카드 문자': 'cd' })[src] ?? 'vc'
@@ -724,6 +731,7 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
                   <>
                     <button className="btn brand" onClick={() => fileRef.current?.click()}>사진 찍기 · 고르기</button>
                     <button className="btn line" onClick={sampleReceipt}>예시 영수증으로 해보기</button>
+                    <button className="chip" onClick={() => setMemo(SAMPLE_RECEIPT_UTTERANCE)}>예시 말 넣기</button>
                   </>
                 ) : (
                   <>
