@@ -8,7 +8,7 @@ import './S04Capture.css'
 // 4 찍고 말하기 (지우의 폰). 영수증 사진 + 말 한 줄 → 줄 단위 나누기 (POST /trips/:tripId/receipts/analyze)
 const RECEIPT = IMG('s04-receipt.jpg')
 const WAVE = [6, 12, 18, 10, 22, 14, 8, 16, 24, 12, 6, 14, 20, 10, 6] // 디자인 파형 높이 (px), 뒤에 흐린 막대 3개
-const TIMEOUT = 8000
+const TIMEOUT = 25000 // 운영 서버에서 분석이 20초 가까이 걸린다 (11/4 측정 18.7초)
 
 /** 큰 사진은 긴 변 1400px JPEG 로 줄인다 (API 한도 3MB) */
 async function shrink(blob) {
