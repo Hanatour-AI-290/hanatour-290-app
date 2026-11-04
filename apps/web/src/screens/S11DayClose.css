@@ -1,0 +1,39 @@
+/* 11 하루 마감: 곧 모자라요 — 진한 보라 밤하늘 */
+.close { background: linear-gradient(180deg, #251350 0%, #5e2bb8 100%); color: #fff; }
+
+/* 작은 별: 아주 느리게 은은히 반짝 */
+.close-star { position: absolute; z-index: 0; border-radius: 50%; background: #fff; opacity: 0.6; animation: close-twinkle 4.8s ease-in-out infinite alternate; animation-delay: var(--tw, 0s); }
+@keyframes close-twinkle { from { opacity: 0.6; } to { opacity: 0.25; } }
+
+.close-body { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; padding: calc(var(--top) + 8px) 20px 0; }
+
+.close-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.14); font-size: 13px; white-space: nowrap; }
+.close-title { margin-top: 18px; font-size: 32px; font-weight: 400; line-height: 1.25; letter-spacing: -0.02em; }
+.close-diff { margin-top: 8px; font-size: 16px; letter-spacing: -0.02em; color: #f4b740; }
+
+/* 남은 리라 · 받을 돈 · 유로 */
+.close-stats { margin-top: 22px; align-self: stretch; display: flex; justify-content: space-between; padding: 14px 6px; border-radius: 18px; background: rgba(255, 255, 255, 0.1); }
+.close-stats div { width: 104px; display: flex; flex-direction: column; align-items: center; gap: 3px; white-space: nowrap; }
+.close-stats span { font-size: 12px; line-height: 17px; color: rgba(255, 255, 255, 0.7); }
+.close-stats b { font-size: 18px; line-height: 22px; }
+
+/* 흰 카드 */
+.close-card { margin-top: 16px; align-self: stretch; display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: #fff; color: var(--ink); box-shadow: 0 12px 15px rgba(18, 8, 48, 0.25); }
+.close-head { height: 26px; display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 400; }
+.close-alert { flex: none; width: 26px; height: 26px; border-radius: 13px; background: #fff1e8; display: flex; align-items: center; justify-content: center; }
+
+.close-calc { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 14px; background: var(--bg); }
+.close-calc p { height: 20px; display: flex; align-items: center; justify-content: space-between; white-space: nowrap; }
+.close-calc p > span { font-size: 14px; color: var(--sub); }
+.close-calc b { font-size: 15px; line-height: 18px; }
+.close-calc i { height: 1px; background: var(--line); }
+.close-calc .close-short { height: 22px; }
+.close-calc .close-short > span { color: var(--ink); }
+.close-short b { display: inline-block; font-family: var(--font-num); font-weight: 900; font-size: 18px; line-height: 22px; letter-spacing: -0.02em; color: #e8590c; transform-origin: right center; }
+.close-short b.ok { color: var(--brand); }
+
+.close-btns { display: flex; align-items: center; gap: 8px; }
+.close-btns .cta { height: 52px; font-size: 15px; }
+.close-btns .close-cut { flex: none; width: 128px; height: 54px; }
+
+.close-mascot { flex: none; align-self: center; width: 110px; height: 163px; margin: 21px 0 var(--bottom); opacity: 0.95; }

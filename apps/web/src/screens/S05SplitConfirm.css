@@ -1,0 +1,52 @@
+/* 5 이렇게 나눌까요? */
+.spl-body { padding: var(--top) 20px 0; display: flex; flex-direction: column; }
+.spl-top { display: flex; align-items: center; justify-content: space-between; height: 26px; }
+.spl-edit { font-size: 15px; color: var(--brand); }
+.spl-title { margin-top: 4px; font-size: 26px; font-weight: 400; letter-spacing: -0.02em; }
+
+.spl-head { margin-top: 10px; display: flex; align-items: center; gap: 12px; }
+.spl-receipt { width: 40px; height: 54px; border-radius: 8px; object-fit: cover; flex: none; }
+.spl-name { font-size: 15px; }
+.spl-sub { margin-top: 2px; font-size: 13px; color: var(--sub); }
+
+/* 영수증 종이: 흰 바탕 + 아래 톱니 */
+.spl-slip { margin-top: 12px; filter: drop-shadow(0 6px 9px rgba(42, 33, 64, 0.07)); }
+.spl-paper { background: #fff; border-radius: 18px 18px 0 0; padding: 6px 18px 10px; }
+.spl-zig { display: block; width: 100%; height: 10px; }
+.spl-dash { display: block; width: 100%; height: 1.5px; }
+.spl-lines { list-style: none; }
+.spl-line-in { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 9px 0; }
+.spl-row { width: 100%; display: flex; align-items: flex-start; justify-content: space-between; }
+.spl-item { display: flex; flex-direction: column; gap: 1px; }
+.spl-item p { font-size: 16px; line-height: 1.3; }
+.spl-item small { font-size: 12px; line-height: 1.3; color: var(--muted); }
+.spl-row .num { font-size: 16px; }
+
+.spl-who { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--sub); }
+.spl-stack { display: flex; padding-left: 2px; }
+/* 22px 아바타 + 흰 테두리 2px (디자인 26px 이미지), 7px 겹침 */
+.spl-stack img { width: 26px; height: 26px; margin: -2px -11px -2px -2px; border: 2px solid #fff; border-radius: 50%; object-fit: cover; }
+.spl-stack img:last-child { margin-right: -2px; }
+.spl-voice { padding: 5px 9px; border-radius: 8px; background: var(--tint); color: var(--brand-deep); font-size: 12px; letter-spacing: -0.02em; }
+
+.spl-sum { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 4px; }
+.spl-ok { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sub); }
+.spl-ok i { width: 18px; height: 18px; border-radius: 9px; background: #f4b740; display: flex; align-items: center; justify-content: center; }
+.spl-sum .num { font-size: 18px; }
+
+/* 노란 질문 */
+.spl-ask { margin-top: 10px; padding: 13px 16px; border-radius: 16px; background: #fff6e0; display: flex; flex-direction: column; gap: 10px; }
+.spl-ask > p { font-size: 14px; color: #6b4a00; }
+.spl-chips { display: flex; gap: 8px; }
+.spl-chips button { padding: 7px 13px; border-radius: 16px; background: #fff; color: var(--sub); font-size: 13px; }
+.spl-chips button.on { background: var(--ink); color: #fff; }
+
+/* 아래: 사람별 몫 + 버튼 */
+.spl-foot { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.spl-shares { list-style: none; display: flex; justify-content: space-between; }
+.spl-shares li { display: flex; align-items: center; gap: 6px; }
+.spl-shares li > div { display: flex; flex-direction: column; }
+.spl-shares small { font-size: 11px; color: var(--sub); }
+.spl-shares .num { font-size: 14px; }
+.spl-foot .cta { flex: none; width: 100%; }
+.spl .scr-foot { padding-top: 4px; }
