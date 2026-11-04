@@ -30,3 +30,9 @@ test('match: 예정 항목이 없으면 모델을 부르지 않고 빈 후보', 
   assert.equal(res.status, 200)
   assert.deepEqual((await res.json()).candidates, [])
 })
+
+test('fx: 없는 날짜(2026-13-45, 2026-02-30)는 400', async () => {
+  for (const d of ['2026-13-45', '2026-02-30', '2026-1-5']) {
+    assert.equal((await app.request(`/api/fx?currency=EUR&date=${d}`)).status, 400, d)
+  }
+})

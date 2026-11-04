@@ -4,7 +4,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { Member } from '@h290/shared'
-import { runPipeline } from '@h290/ai'
+import { runPipeline, UnreadableReceipt } from '@h290/ai'
 
 const r = new Hono()
 
@@ -34,7 +34,13 @@ r.post('/analyze', async (c) => {
   const me = String(form.me ?? members[0].name)
   const data = Buffer.from(await image.arrayBuffer()).toString('base64')
   // AI 호출 오류(한도 초과 등)는 app.js onError 가 429 / 502 로 바꾼다 → 화면은 직접 입력으로 넘긴다 (AVL-003)
-  return c.json(await runPipeline({ image: data, mediaType: image.type, utterance, members, me }))
+  try {
+    return c.json(await runPipeline({ image: data, mediaType: image.type, utterance, members, me }))
+  } catch (e) {
+    // 영수증이 아닌 사진 · 너무 흐린 사진: 지어낸 합계로 기록하지 않고 422 → 화면은 합계만 읽기 → 직접 입력 (AVL-003, R-25)
+    if (e instanceof UnreadableReceipt) return c.json({ error: e.message }, 422)
+    throw e
+  }
 })
 
 export default r

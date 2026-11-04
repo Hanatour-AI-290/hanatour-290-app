@@ -36,11 +36,21 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 | 400 | 보낸 값의 형식이 틀림 | JSON 본문 API: `issues` 예) `["days: Invalid input: expected number, received undefined"]` |
 | 404 | 찾는 것이 없음 (환율 등) | |
 | 413 | 사진이 너무 큼 | |
-| 422 | 형식은 맞지만 앞뒤가 안 맞음 | `errors` (틀린 점 목록) |
+| 422 | 형식은 맞지만 앞뒤가 안 맞음, 영수증을 읽지 못함 (`/receipts/analyze`) | `errors` (틀린 점 목록) |
+| 429 | 요청이 너무 많음 (아래 요청 수 제한) 또는 AI 요청이 많음 | `Retry-After` 헤더 (초) |
 | 502 | AI 호출 실패 | |
 | 503 | AI 사용 한도 초과 (`AI 사용 한도를 넘었어요`) | 화면은 직접 입력으로 넘긴다 |
-| 429 | AI 요청이 많음 | |
-| 502 | AI 호출 실패 | |
+
+### 요청 수 제한 (BE-7)
+
+QR 로 공개한 링크에서 API 키 비용이 커지지 않게 접속 기기(IP, `x-forwarded-for` 첫 칸)마다 1분 창으로 센다 (`apps/api/src/lib/rateLimit.js`).
+
+| API | 한도 | 바꾸는 환경변수 |
+| --- | --- | --- |
+| Claude 를 부르는 `/estimate` · `/record` · `/trips/:tripId/receipts/*` | 분당 30회 | `AI_RATE_LIMIT` |
+| 나머지 | 분당 300회 | `API_RATE_LIMIT` |
+
+서버 메모리에 세므로 Vercel 함수 인스턴스마다 따로 센다 (근사치).
 
 ## 값 목록
 
@@ -63,7 +73,8 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 ## POST /record
 
 요청 `{ "text"?: "말 한 줄 (500자 이하)", "image"?: "data:image/jpeg;base64,...", "kind"?: "sms", "members": ["지우", ...], "me": "지우" }`
-응답 `{ "name", "category", "amount", "currency", "payer", "payers": [], "people": [], "evidence" }` - 팀원 이름이 아닌 payer·payers·people 은 서버가 버린다.
+응답 `{ "name", "category", "amount", "currency", "payer", "payers": [], "people": [], "evidence", "refund" }` - 팀원 이름이 아닌 payer·payers·people 은 서버가 버린다.
+`refund: true` 는 카드 승인 취소 · 환불 문자 (새 지출이 아님, `amount` 는 양수). AI 가 음수 금액을 주면 서버가 `refund: true` + 양수로 바꾼다. 화면은 지출로 적지 않는다.
 `payers` 는 결제자들 `[{ name, amount }]` (소수, FR-008). 한 명이면 총액, 금액을 모르는 사람이 한 명이면 나머지 금액, 둘 이상이면 amount null. 화면은 두 명 이상이고 금액을 다 알 때만 나눠 낸 것으로 넣는다.
 
 이 응답을 정산에 쓰려면 화면이 `Expense` 로 바꿔서 `/settle` 에 보낸다.
@@ -73,7 +84,7 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 
 결제일 환율 (R-20). 외화 1 단위가 몇 원인지.
 
-요청 `GET /api/fx?currency=TRY&date=2026-11-01` (`date` 를 비우면 최신)
+요청 `GET /api/fx?currency=TRY&date=2026-11-01` (`date` 를 비우면 최신. 없는 날짜 `2026-13-45` · `2026-02-30` 은 400)
 
 응답
 
@@ -370,7 +381,8 @@ Claude 를 부르지 않는다. 이름 비교는 서버 안의 문장 임베딩 
 ## POST /trips/:tripId/receipts/analyze
 
 `runPipeline`(영수증 줄 단위 읽기 → 검사 틀리면 1회 다시 읽기 → 말로 줄별 배정 → 남은 오류는 질문)을 부른다.
-2026-11-04 기준 해커톤 키의 작업공간 사용 한도가 차서 실제 호출은 503 으로 실패하고, 성공 응답은 아직 실호출로 확인하지 못했다.
+읽은 메뉴 줄이 없거나 합계가 0 이하면 (영수증이 아닌 사진, 너무 흐린 사진) **422** `{ "error": "영수증을 읽지 못했어요" }`. 지어낸 통화 · 합계로 결과를 만들지 않는다 (R-25). 화면은 다시 찍게 한다.
+서버 검사가 결제자 금액 합을 물으면, AI 가 같은 내용을 줄 번호 없이 따로 물은 질문은 뺀다 (질문이 두 번 뜨지 않게).
 
 요청 (multipart): `image` 파일 (jpg · png · webp · gif, 3MB 이하), `utterance` 문자열 (500자 이하), `members` JSON 문자열 `[{"id":"m1","name":"지우"}, ...]`, `me` 올린 사람 이름 (선택, 기본 첫 멤버)
 

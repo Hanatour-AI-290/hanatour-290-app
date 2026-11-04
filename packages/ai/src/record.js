@@ -16,6 +16,7 @@ export const RecordResult = z.object({
   })).describe('돈을 낸 사람들 (FR-008). 여러 명이 나눠 냈으면 모두. 말에 없으면 빈 배열'),
   people: z.array(z.string()).describe('이 돈을 나눌 사람(팀원 이름). 혼자 쓴 돈이면 말한 사람만, 말에 없으면 빈 배열'),
   evidence: z.string().describe('근거: 영수증 합계 줄, 카드 문자의 승인 금액 줄, 말한 문장 중 해당 부분 그대로'),
+  refund: z.boolean().describe('카드 승인 취소 · 환불 문자면 true (새 지출이 아니라 앞선 결제를 되돌린 것). amount 는 양수로'),
 })
 
 const SYSTEM = (members, me) => `너는 패키지 여행 가계부의 기록 도우미다. 입력(영수증 사진, 카드 결제 문자, 말 한 줄)에서 지출 하나를 뽑는다.
@@ -25,6 +26,7 @@ const SYSTEM = (members, me) => `너는 패키지 여행 가계부의 기록 도
 - 금액·사람은 입력에 있는 것만 쓴다. 없으면 null 또는 빈 배열로 둔다. 추측하지 않는다.
 - "다 같이", "넷이"처럼 모두를 말하면 people에 팀원 전체를 넣는다.
 - "누구 빼고"라고 하면 그 사람을 people에서 뺀다.
+- 카드 문자가 승인취소 · 취소 · 환불이면 refund 를 true 로 하고 amount 는 양수로 쓴다. 지출이 아니다.
 - "지우가 2000, 하린이 1560 냈어"처럼 여러 명이 나눠 냈으면 payers에 모두 넣는다. 금액을 말했으면 그 금액, "반씩"처럼 방법만 말했으면 그대로 계산한 금액, 금액 말이 없으면 null.`
 
 /**
@@ -52,6 +54,13 @@ export async function readRecord({ text = '', image, kind, members, me }) {
   const out = resp.parsed_output
   if (!out) return { ok: false, reason: 'unparsed' }
 
+  // 음수 금액은 취소 · 환불로 본다 (AI 가 -320 처럼 돌려준 경우). 지출로 기록하지 않게 화면에 refund 로 알린다
+  if (typeof out.amount === 'number' && out.amount < 0) {
+    out.refund = true
+    out.amount = -out.amount
+    out.payers = out.payers.map((p) => ({ ...p, amount: p.amount == null ? null : Math.abs(p.amount) }))
+  }
+  out.refund = Boolean(out.refund)
   // 팀원 이름이 아닌 값은 버린다 (추측 방지, R-25)
   out.payer = members.includes(out.payer) ? out.payer : null
   out.people = out.people.filter((p) => members.includes(p))

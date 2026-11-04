@@ -81,8 +81,16 @@ export default function Capture({ next, prev, toast, state, set }) {
       form.set('me', '지우')
       const timeout = new Promise((_, no) => { timer = setTimeout(() => no(new Error('시간 초과')), TIMEOUT) })
       dinner = await Promise.race([postForm('/api/trips/t1/receipts/analyze', form), timeout])
-    } catch {
-      dinner = null // 501 · 503 · 시간 초과 → 다음 화면은 디자인 예시 값(DINNER)으로
+    } catch (e) {
+      clearTimeout(timer)
+      if (!alive.current) return
+      // 직접 찍은 사진을 못 읽었으면(영수증이 아닌 사진 422, 서버 오류, 시간 초과) 예시 영수증 결과를 보여 주지 않는다 → 다시 찍기 (AVL-003, R-25)
+      if (photo) {
+        setBusy(false)
+        toast(e?.status === 422 ? '영수증을 읽지 못했어요 · 다시 찍어 주세요' : `${e?.status ? e.message : '분석이 늦어지고 있어요'} · 다시 시도해 주세요`)
+        return
+      }
+      dinner = null // 시연 영수증: 501 · 503 · 시간 초과 → 다음 화면은 디자인 예시 값(DINNER)으로 (시연이 멈추지 않게)
     } finally {
       clearTimeout(timer)
     }
