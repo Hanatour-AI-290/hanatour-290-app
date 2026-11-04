@@ -40,7 +40,7 @@ export default function Wallet({ state, tab, go, toast }) {
           </article>
         </div>
 
-        <div className="w-today rise" style={{ '--d': '0.2s' }}>
+        <div className="w-today rise" style={{ '--d': '0.2s' }} role="button" tabIndex={0} onClick={() => go('11')} onKeyDown={(e) => e.key === 'Enter' && go('11')}>
           <div className="w-today-head">
             <h2>오늘, DAY {TRIP5.today}</h2>
             <span className="num-b">{lira(daily)}리라 중 <CountUp to={spent} className="" delay={350} />리라</span>

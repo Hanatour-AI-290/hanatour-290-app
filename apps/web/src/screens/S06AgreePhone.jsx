@@ -24,6 +24,14 @@ export default function AgreePhone({ next, toast, state }) {
     timer.current = setTimeout(next, 700)
   }
 
+  // Figma 프로토타입: 안 갔어요도 정산방(7)으로
+  const decline = () => {
+    if (done) return
+    setDone(true)
+    toast(`${d.payer}에게 안 갔다고 알렸어요`)
+    timer.current = setTimeout(next, 700)
+  }
+
   return (
     <section className="scr agr fade">
       <div className="agr-photo"><img className="kenburns" src={IMG('dinner.png')} alt="" /></div>
@@ -40,7 +48,7 @@ export default function AgreePhone({ next, toast, state }) {
         <p className="agr-amt"><CountUp to={mine} delay={450} /><span className="agr-unit">리라</span></p>
         <p className="agr-parts">{parts.map((p) => `${p.name} ${lira(p.v)}`).join(' + ')}</p>
         <div className="agr-btns">
-          <button type="button" className="agr-no" onClick={() => toast(`${d.payer}에게 안 갔다고 알렸어요`)} disabled={done}>안 갔어요</button>
+          <button type="button" className="agr-no" onClick={decline} disabled={done}>안 갔어요</button>
           <button type="button" className={`agr-yes ${done ? 'on' : ''}`} onClick={agree}>
             {done && <i className="pop" style={{ '--d': '0s' }}><img src={IMG('s05-check.svg')} width="11" height="11" alt="" /></i>}
             맞아요
