@@ -1,0 +1,30 @@
+/* 6 하린의 폰: 맞아요 누르기 */
+.agr { background: #1a1520; }
+.agr-photo { position: absolute; top: 0; left: 0; right: 0; height: 420px; overflow: hidden; }
+.agr-photo img { width: 100%; height: 100%; object-fit: cover; }
+.agr-dim { position: absolute; inset: 0; background: rgba(18, 13, 31, 0.45); }
+
+.agr-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 532px; max-height: calc(100% - 40px);
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 12px 24px 24px; border-radius: 28px 28px 0 0; background: #fff;
+  overflow-y: auto; scrollbar-width: none;
+}
+.agr-grab { align-self: center; flex: none; width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
+.agr-from { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
+.agr-from p { font-size: 19px; line-height: 1.35; letter-spacing: -0.02em; }
+.agr-pic { margin-top: 16px; flex: none; width: 100%; height: 140px; border-radius: 16px; object-fit: cover; }
+.agr-what { margin-top: 14px; font-size: 14px; color: var(--sub); }
+.agr-label { margin-top: 18px; font-size: 14px; color: var(--sub); }
+.agr-amt { display: flex; align-items: baseline; gap: 6px; }
+.agr-amt .num { font-size: 44px; }
+.agr-amt .agr-unit { font-size: 20px; color: var(--sub); }
+.agr-parts { font-size: 14px; color: var(--sub); }
+
+.agr-btns { margin-top: 22px; width: 100%; display: flex; gap: 8px; }
+.agr-btns button { height: 57px; border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; text-align: center; }
+.agr-no { flex: none; width: 112px; background: #fff; border: 1px solid var(--line); color: var(--ink); }
+.agr-yes { flex: 1; background: var(--brand); color: #fff; }
+.agr-yes.on { background: var(--brand-deep); }
+.agr-yes i { width: 20px; height: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.22); display: flex; align-items: center; justify-content: center; }
+.agr-note { margin-top: 12px; width: 100%; text-align: center; font-size: 12px; color: var(--sub); }

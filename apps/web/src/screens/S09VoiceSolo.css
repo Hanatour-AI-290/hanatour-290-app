@@ -1,0 +1,37 @@
+/* 9 혼자 쓴 돈은 말로 */
+.solo { background: #1a1520; }
+
+/* 위 바자르 사진 (360px) + 위쪽 어둡게 */
+.solo-photo { position: absolute; top: 0; left: 0; right: 0; height: 360px; overflow: hidden; }
+.solo-photo img { width: 100%; height: 100%; object-fit: cover; }
+.solo-shade { position: absolute; top: 0; left: 0; right: 0; height: 120px; background: linear-gradient(to bottom, rgba(13, 8, 20, 0.55), rgba(13, 8, 20, 0)); }
+
+/* 흰 시트: 위에서 290px 부터 끝까지 */
+.solo-sheet {
+  position: absolute; top: 290px; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  padding: 12px 24px max(24px, var(--bottom));
+  background: #fff; border-radius: 28px 28px 0 0;
+  overflow-y: auto; scrollbar-width: none;
+}
+.solo-sheet::-webkit-scrollbar { display: none; }
+.solo-grip { flex: none; align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
+
+.solo-said { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 15px; letter-spacing: -0.02em; color: var(--sub); white-space: nowrap; }
+.solo-mic { flex: none; width: 28px; height: 28px; border-radius: 14px; background: var(--tint); display: flex; align-items: center; justify-content: center; }
+.solo-title { margin-top: 12px; font-size: 24px; font-weight: 400; letter-spacing: -0.02em; }
+
+/* 읽은 항목 줄 */
+.solo-list { margin-top: 14px; list-style: none; }
+.solo-list li { border-bottom: 1px solid var(--line); }
+.solo-list li:last-child { border-bottom: 0; }
+.solo-list button { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 13px 0; }
+.solo-k { font-size: 15px; color: var(--sub); }
+.solo-v { display: flex; align-items: center; gap: 6px; font-size: 16px; white-space: nowrap; }
+.solo-amt { display: flex; flex-direction: column; align-items: flex-end; }
+.solo-amt b { font-size: 16px; }
+.solo-amt small { font-size: 12px; color: var(--sub); }
+.solo-chip { padding: 4px 10px; border-radius: 10px; background: var(--tint); color: var(--brand); font-size: 14px; }
+
+.solo-foot { margin-top: 18px; display: flex; gap: 8px; }
+.solo-foot .solo-again { flex: none; width: 120px; }

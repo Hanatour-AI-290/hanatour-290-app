@@ -1,0 +1,36 @@
+/* 4 찍고 말하기 */
+.cap { background: #1a1520; }
+
+/* 위: 영수증 사진 (아래 시트 뒤까지 이어진다 — 디자인 600px 높이, 위로 40px 넘침) */
+.cap-top { position: relative; flex: 1; min-height: 120px; }
+.cap-photo { position: absolute; left: 0; right: 0; top: -40px; width: 100%; height: calc(100% + 180px); object-fit: cover; }
+.cap-shade { position: absolute; left: 0; right: 0; top: 0; height: 140px; background: linear-gradient(to bottom, rgba(13, 8, 20, 0.65), rgba(13, 8, 20, 0)); }
+.cap-bar { position: absolute; left: 0; right: 0; top: max(52px, calc(env(safe-area-inset-top) + 8px)); display: flex; align-items: center; padding: 0 18px; }
+.cap-bar h1 { position: absolute; left: 0; right: 0; text-align: center; font-size: 16px; font-weight: 400; color: #fff; pointer-events: none; }
+
+/* 아래: 흰 시트 */
+.cap-sheet { position: relative; z-index: 1; flex: none; display: flex; flex-direction: column; padding: 12px 24px calc(24px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; background: #fff; }
+.cap-grip { align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
+
+.cap-done { margin-top: 14px; display: flex; align-items: center; gap: 8px; }
+.cap-badge { flex: none; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 11px; background: #f4b740; }
+.cap-done p { flex: 1; min-width: 0; font-size: 14px; }
+.cap-done button { flex: none; font-size: 13px; color: var(--sub); }
+
+.cap-ask { margin-top: 16px; font-size: 24px; font-weight: 400; line-height: 1.3; letter-spacing: -0.02em; }
+
+.cap-said { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; padding: 16px 18px 14px; border-radius: 20px; background: var(--tint); }
+.cap-said p { font-size: 18px; line-height: 1.45; letter-spacing: -0.02em; color: var(--brand-deep); }
+.cap-wave { display: flex; align-items: center; gap: 3px; height: 24px; }
+.cap-wave .wave { display: flex; align-items: center; gap: 3px; }
+.cap-wave i { display: block; width: 3px; border-radius: 2px; background: var(--brand); }
+.cap-wave i.dim { height: 4px; background: rgba(94, 43, 184, 0.25); }
+
+.cap-ctrl { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
+.cap-even, .cap-send { width: 90px; font-size: 14px; }
+.cap-even { color: var(--sub); }
+.cap-send { text-align: right; color: var(--brand); }
+.cap-ring { display: flex; align-items: center; justify-content: center; width: 84px; height: 84px; border-radius: 42px; background: var(--lavender); }
+.cap-mic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 32px; background: var(--brand); box-shadow: 0 6px 8px rgba(94, 43, 184, 0.35); }
+.cap-ctrl button:disabled { opacity: 1; cursor: default; }
+.cap-send[aria-busy='true'] { color: var(--muted); }
