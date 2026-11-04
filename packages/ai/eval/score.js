@@ -63,3 +63,51 @@ export function summarize(rows) {
     avgSeconds: rows.length ? Math.round(sum('ms') / rows.length / 100) / 10 : null,
   }
 }
+
+/* ---------- 문장 측정 (PER-001 "문장 20개"): 말·카드 문자 → 지출 하나 (readRecord) ---------- */
+
+const sameSet = (a, b) => [...a].sort().join(',') === [...b].sort().join(',')
+
+/**
+ * 문장 하나 채점. 결제자·나눌 사람을 비우면 화면이 말한 사람(me)으로 채우므로 그렇게 보고 비교한다 (App.jsx addFrom 과 같게).
+ * @param {{ amount: number | null, currency: string, payers?: { name: string, amount: number }[], people: string[], category: string }} expected
+ *   payers 가 없으면 말한 사람이 혼자 낸 것이 정답. amount null = 금액이 없는 문장이라 비워 두는 게 정답
+ * @param {{ amount: number | null, currency: string, payer: string | null, payers?: { name: string, amount: number | null }[], people: string[], category: string }} got readRecord 결과
+ * @param {string} me 말한 사람
+ */
+export function scoreSentence(expected, got, me) {
+  const amountOk = expected.amount == null
+    ? got.amount == null
+    : got.amount === expected.amount && got.currency === expected.currency
+
+  const want = expected.payers ?? [{ name: me, amount: expected.amount }]
+  const have = got.payers?.length > 1 ? got.payers : [{ name: got.payer ?? me, amount: got.amount }]
+  const key = (list) => list.map((p) => `${p.name}:${list.length > 1 ? p.amount : ''}`)
+  const payerOk = sameSet(key(want), key(have))
+
+  const peopleOk = sameSet(expected.people, got.people.length ? got.people : [me])
+  const categoryOk = got.category === expected.category
+  const correct = amountOk && payerOk && peopleOk && categoryOk
+  // 금액을 비우면(읽지 못함) 화면이 직접 입력으로 넘기므로 사용자가 알아챈다
+  const flagged = got.amount == null
+  return { amountOk, payerOk, peopleOk, categoryOk, correct, flagged }
+}
+
+/**
+ * 문장 점수 모으기.
+ * @param {(ReturnType<typeof scoreSentence> & { ms: number })[]} rows
+ */
+export function summarizeSentences(rows) {
+  const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null)
+  const rate = (k) => pct(rows.filter((r) => r[k]).length, rows.length)
+  const wrong = rows.filter((r) => !r.correct)
+  return {
+    cases: rows.length,
+    amountMatch: rate('amountOk'), // 금액·통화 일치율 (%)
+    payerAccuracy: rate('payerOk'), // 결제자 정답률 (%)
+    peopleAccuracy: rate('peopleOk'), // 나눌 사람 정답률 (%)
+    categoryMatch: rate('categoryOk'), // 분류 일치율 (%)
+    caught: pct(wrong.filter((r) => r.flagged).length, wrong.length), // 틀린 것 중 비워 둬서 직접 입력으로 넘어간 비율 (%)
+    avgSeconds: rows.length ? Math.round(rows.reduce((a, r) => a + r.ms, 0) / rows.length / 100) / 10 : null,
+  }
+}

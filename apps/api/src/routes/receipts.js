@@ -1,6 +1,6 @@
 // 찍고 → 말하고 → 확인 (R-07~R-10)
 // POST /api/trips/:tripId/receipts/analyze  (multipart) image 파일 · utterance 문자열 · members JSON 문자열 · me(올린 사람 이름, 선택)
-//   → { receipt, payerId, splits, questions, check, retried }  AI 결과 초안. 정산에 넣는 건 확인 카드에서 사용자가 한다
+//   → { receipt, payerId, payers, splits, questions, check, retried }  AI 결과 초안. 정산에 넣는 건 확인 카드에서 사용자가 한다
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { Member } from '@h290/shared'

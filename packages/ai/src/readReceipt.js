@@ -1,7 +1,7 @@
 // 1단계 "찍고": 영수증 사진 → 줄 단위 항목 (R-07). 금액은 AI 가 읽은 소수 그대로 받고, 최소 단위 정수 변환은 코드가 한다.
 import { z } from 'zod'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
-import { minorDigits } from '@h290/shared'
+import { Category, minorDigits } from '@h290/shared'
 import { getClient, MODEL } from './client.js'
 
 const Line = z.object({
@@ -19,20 +19,22 @@ export const ReceiptRead = z.object({
   total: z.number().describe('최종 합계 (TOPLAM, TOTAL). 소수로'),
   lines: z.array(Line).describe('메뉴 줄과 세금 줄. 소계(ARA TOPLAM)·합계·결제수단 줄은 넣지 않는다'),
   paidAt: z.string().nullable().describe('영수증의 날짜·시각을 YYYY-MM-DDTHH:MM 로. 없으면 null'),
+  category: Category.describe('지출 분류 (FR-018). 식당·카페면 식사, 투어·입장권이면 선택관광, 택시·버스면 교통, 가게면 쇼핑'),
 })
 
 const SYSTEM = `너는 여행 영수증을 줄 단위로 읽는다.
 - 메뉴·상품 줄과 세금 줄만 lines 에 넣는다. 소계, 합계, 결제수단, 인사말 줄은 넣지 않는다.
 - 금액은 영수증에 찍힌 숫자만 쓴다. 유럽식 표기(2.600,00)는 2600 으로 읽는다. 추측하지 않는다.
 - 세금이 메뉴 가격에 이미 포함됐다고 적혀 있으면(KDV DAHİL 등) 세금 줄을 따로 넣지 않는다.
-- nameKo 는 여행자가 알아보기 쉬운 짧은 한국어로 쓴다.`
+- nameKo 는 여행자가 알아보기 쉬운 짧은 한국어로 쓴다.
+- 카드 번호, 승인 번호, 직원·손님 이름 같은 개인정보는 어떤 칸(source 포함)에도 옮기지 않는다. (보안 요구사항 3)`
 
 /** 소수 금액 → 최소 단위 정수 (TRY 2600 → 260000) */
 const toMinor = (v, currency) => Math.round(v * 10 ** minorDigits(currency))
 
 /**
  * @param {{ image: string, mediaType: string, hint?: string[] }} input  base64 이미지, hint = 지난번에 틀린 점 (재시도 때)
- * @returns {Promise<{ lines: import('zod').infer<typeof import('@h290/shared').ReceiptLine>[], total: number, currency: string, merchant: string | null, paidAt: string | null }>}
+ * @returns {Promise<ReturnType<typeof toReceipt>>}
  */
 export async function readReceipt({ image, mediaType, hint = [] }) {
   const text = hint.length
@@ -49,12 +51,19 @@ export async function readReceipt({ image, mediaType, hint = [] }) {
     ] }],
   })
   if (resp.stop_reason === 'refusal' || !resp.parsed_output) throw new Error('영수증을 읽지 못했어요')
+  return toReceipt(resp.parsed_output)
+}
 
-  const r = resp.parsed_output
+/**
+ * AI 가 읽은 결과(ReceiptRead) → 서버가 쓰는 모양. 금액은 최소 단위 정수, 단가는 코드가 계산한다.
+ * @param {import('zod').infer<typeof ReceiptRead>} r
+ */
+export function toReceipt(r) {
   const currency = r.currency.toUpperCase()
   return {
     merchant: r.merchant,
     paidAt: r.paidAt,
+    category: r.category,
     currency,
     total: toMinor(r.total, currency),
     lines: r.lines.map((l) => {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { SAMPLE, SAMPLE_RESULT, SAMPLE_SMS, ME, MEMBERS, TRIP, SEED, MEMBER_IDS, ROOM, NAME_OF, WALLETS, LIVING_PER_DAY_KRW } from './sample.js'
-import { confirmFor, dayDate, fromMinor, paidAtOf, payerNames, postForm, postJson, toExpense, toMinor, useFx, usePost } from './api.js'
+import { confirmFor, dayDate, fromMinor, paidAtOf, payerNames, postForm, postJson, splitPayers, toExpense, toMinor, useFx, usePost } from './api.js'
 
 const PATH = {
   home: 'M4 10.5 12 4l8 6.5V20h-5.5v-6h-5v6H4z',
@@ -378,7 +378,7 @@ function LinesCard({ r, update }) {
     const next = now.includes(name) ? now.filter((n) => n !== name) : [...now, name]
     if (!next.length) return
     const splits = [...r.splits.filter((s) => s.lineIndex !== i), { lineIndex: i, memberIds: next.map((n) => MEMBER_IDS[n]), source: '직접 고침' }]
-    update(r.id, { splits, confirm: confirmFor(involvedOf(r.lines, splits, r.people), r.payer) })
+    update(r.id, { splits, confirm: confirmFor(involvedOf(r.lines, splits, r.people), payerNames(r)) })
   }
   return (
     <div className="lines">
@@ -472,14 +472,16 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
     setBusy(src === '영수증' ? '영수증 합계 읽는 중' : src === '카드 문자' ? '카드 문자 읽는 중' : '말한 내용 정리하는 중')
     try {
       const out = await post('/api/record', { ...body, members: MEMBERS, me: viewer })
-      const payer = out.payer ?? viewer
+      const method = body.kind === 'sms' ? 'card' : /현금/.test(body.text ?? '') ? 'cash' : 'card'
+      // 여러 명이 나눠 냈으면 모두 (FR-008). 배포본이 아직 payers 를 안 주면 payer 하나로
+      const payers = splitPayers(out.payers, method)
+      const payer = payers?.[0].name ?? out.payer ?? viewer
       const people = out.people.length ? out.people : [viewer]
       addRecord({
         id: `r${Date.now()}`, src, day, time: nowHHMM(), name: out.name, category: out.category,
         amount: out.amount, currency: out.currency === 'OTHER' ? null : out.currency,
-        perPerson: false, required: false, status: 'done', payer, people, evidence: out.evidence,
-        method: body.kind === 'sms' ? 'card' : /현금/.test(body.text ?? '') ? 'cash' : 'card',
-        confirm: confirmFor(people, payer),
+        perPerson: false, required: false, status: 'done', payer, ...(payers ? { payers } : {}), people, evidence: out.evidence,
+        method, confirm: confirmFor(people, payers ? payers.map((p) => p.name) : payer),
       })
       toast(people.length > 1 ? `${people.length}명이 나눌 돈으로 기록했어요` : '내 지출로 기록했어요')
     } catch (e) {
@@ -534,16 +536,18 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
       form.set('me', viewer)
       const out = await postForm('/api/trips/t1/receipts/analyze', form)
       const cur = out.receipt.currency
-      const payer = NAME_OF[out.payerId] ?? viewer
+      // 여러 명이 나눠 냈으면 모두 (FR-008). 금액은 최소 단위 → 소수
+      const payers = splitPayers(out.payers?.map((p) => ({ name: NAME_OF[p.memberId], amount: p.amount == null ? null : fromMinor(p.amount, cur) })), 'card')
+      const payer = payers?.[0].name ?? NAME_OF[out.payerId] ?? viewer
       const people = involvedOf(out.receipt.lines, out.splits, [...MEMBERS])
       setBusy('')
       addRecord({
         id: `r${Date.now()}`, src: '영수증', day, time: out.receipt.paidAt?.slice(11, 16) || nowHHMM(),
-        name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: '식사',
+        name: out.receipt.merchant || '영수증', merchant: out.receipt.merchant ?? undefined, category: out.receipt.category ?? '식사',
         amount: fromMinor(out.receipt.total, cur), currency: cur, perPerson: false, required: false,
-        status: 'review', payer, people, evidence: text || '말 없이 영수증만',
+        status: 'review', payer, ...(payers ? { payers } : {}), people, evidence: text || '말 없이 영수증만',
         lines: out.receipt.lines, splits: out.splits, questions: out.questions,
-        method: 'card', confirm: confirmFor(people, payer),
+        method: 'card', confirm: confirmFor(people, payers ? payers.map((p) => p.name) : payer),
       })
       toast('줄마다 누가 낼지 확인해 주세요')
     } catch {
