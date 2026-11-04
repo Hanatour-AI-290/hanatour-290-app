@@ -35,3 +35,29 @@
 
 .solo-foot { margin-top: 18px; display: flex; gap: 8px; }
 .solo-foot .solo-again { flex: none; width: 120px; }
+
+/* 말 문구 고치기 (FR-016): 누르면 같은 자리 textarea */
+.solo-said { transition: color 0.2s; }
+.solo-line { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 15px; letter-spacing: -0.02em; color: var(--sub); cursor: text; }
+.solo-edit { flex: 1; min-width: 0; padding: 4px 0; border: 0; border-bottom: 1.5px solid var(--brand); outline: 0; resize: none; overflow: hidden; background: none; font-size: 15px; line-height: 1.4; letter-spacing: -0.02em; color: var(--ink); white-space: normal; caret-color: var(--brand); }
+.solo-said.on { align-items: flex-start; }
+.solo-sms { flex: none; margin-left: auto; font-size: 13px; color: var(--muted); }
+
+/* AI 가 읽는 동안 값만 살짝 흐리게 */
+.solo-v { transition: opacity 0.25s; }
+.solo-list.busy .solo-v { opacity: 0.4; }
+
+/* 금액 직접 입력 (AVL-003) */
+.solo-row { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 13px 0; }
+.solo-type { flex-direction: row; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 10px; background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--brand); }
+.solo-type input { width: 88px; padding: 0; border: 0; outline: 0; background: none; text-align: right; font-size: 16px; }
+.solo-type b { font-size: 16px; }
+
+/* 카드 문자 시트 (FR-015) */
+.solo-dim { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: flex-end; background: rgba(13, 8, 20, 0.45); }
+.solo-smsheet { display: flex; flex-direction: column; padding: 12px 24px max(24px, var(--bottom)); border-radius: 28px 28px 0 0; background: #fff; }
+.solo-smsheet h2 { margin-top: 14px; font-size: 22px; font-weight: 400; letter-spacing: -0.02em; }
+.solo-smsheet p { margin-top: 6px; font-size: 13px; line-height: 1.45; color: var(--sub); }
+.solo-smsheet textarea { margin-top: 14px; width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; outline: 0; resize: none; background: var(--bg); font-size: 14px; line-height: 1.5; transition: border-color 0.2s; }
+.solo-smsheet textarea:focus { border-color: var(--brand); }
+.solo-smsheet .solo-again { width: 132px; }
