@@ -1,9 +1,8 @@
 // 2단계 "말하고": "맥주는 하린이랑 도윤, 서준은 술 빼고" → 줄별 배정 (R-08, R-10)
 // AI 는 이름으로 답하고, 이름 → memberId 변환과 명단 밖 이름 거르기는 코드가 한다 (R-25 추측 금지).
 import { z } from 'zod'
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { minorDigits } from '@h290/shared'
-import { getClient, MODEL } from './client.js'
+import { parse } from './client.js'
 import { resolvePayers } from './payers.js'
 
 export const AssignResult = z.object({
@@ -43,10 +42,10 @@ export async function assignLines({ lines, members, utterance, me, currency, tot
   const meName = me ?? names[0]
   const table = lines.map((l, i) => `${i}. ${l.nameKo || l.name} (${l.name}) ${l.kind === 'tax' ? '[세금]' : ''}`).join('\n')
 
-  const resp = await getClient().messages.parse({
-    model: MODEL,
+  const resp = await parse({
     max_tokens: 4000,
-    output_config: { effort: 'low', format: zodOutputFormat(AssignResult) },
+    schema: AssignResult,
+    output_config: { effort: 'low' },
     system: SYSTEM(names, meName),
     messages: [{ role: 'user', content: `<영수증줄>\n${table}\n</영수증줄>\n<말>${utterance || '(말 없음)'}</말>${retryNote(hint)}` }],
   })
