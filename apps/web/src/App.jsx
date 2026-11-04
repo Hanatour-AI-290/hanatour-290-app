@@ -211,7 +211,9 @@ function Result({ data, picks, setPicks, back, makeLedger, budget }) {
   const optMine = opts.filter((r) => picks.includes(r.i)).reduce((a, r) => a + r.krw, 0)
   const tiers = [['최소', base + req], ['내가 고른 것', base + req + optMine], ['옵션 전부', base + req + optAll]]
   const mine = tiers[1][1]
-  const unknown = rows.filter((r) => r.krw == null)
+  // 문구에 금액이 없는 항목과, 금액은 있는데 환율이 없어 원화로 못 바꾼 항목은 따로 알린다
+  const unknown = rows.filter((r) => r.amount == null)
+  const noRate = rows.filter((r) => r.amount != null && r.krw == null)
   const trip = isTurkey(data.title)
   const nOpt = rows.filter((r) => r.category === '선택관광').length
   const toggle = (i) => setPicks(picks.includes(i) ? picks.filter((x) => x !== i) : [...picks, i])
@@ -278,6 +280,12 @@ function Result({ data, picks, setPicks, back, makeLedger, budget }) {
               {trip && <><br />비교 영상에서는 옵션을 모두 하니 166만 원이 더 들어 290만 원이었어요.</>}
             </div>
           )}
+          {noRate.length > 0 && (
+            <div className="unknown">
+              <b>원화로 못 바꾼 항목 {noRate.length}개</b> · 환율을 불러오지 못해 합계에서 빠졌어요<br />
+              {noRate.map((r) => `${r.name} ${money(r.amount, r.currency)}`).join(', ')}
+            </div>
+          )}
           {budget && (
             <div className="budget">
               <div><small>하루 예산 · {budget.days}일 기준</small><b>{man1(budget.perDayKrw)}<em>만 원</em></b></div>
@@ -286,7 +294,7 @@ function Result({ data, picks, setPicks, back, makeLedger, budget }) {
           )}
           <div className="fx">
             동그라미를 눌러 할 옵션만 고르세요. 이름을 누르면 AI가 근거로 삼은 원문 구절이 보여요.<br />
-            {fx ? `외화는 ${fx.date} 유럽중앙은행 기준 환율로 계산했어요.` : '환율을 불러오지 못해 외화 항목은 합계에서 빠졌어요.'}
+            {fx ? `외화는 ${fx.date} ${fx.source === 'ExchangeRate-API' ? 'ExchangeRate-API(Rates By Exchange Rate API)' : '유럽중앙은행'} 기준 환율로 계산했어요.` : '환율을 불러오지 못해 외화 항목은 합계에서 빠졌어요.'}
           </div>
         </div>
       </div>

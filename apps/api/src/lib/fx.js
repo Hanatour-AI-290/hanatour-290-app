@@ -1,17 +1,19 @@
 // 환율. 실패하면 null → 화면은 외화 그대로 보여 준다.
 
-// 상품 분석(estimate)용 최신 환율 4개 통화 (프로토타입 api/_shared.js rates() 에서 옮김)
+// 상품 분석(estimate)용 최신 환율 4개 통화. 결제일 환율과 같은 출처 순서(Frankfurter → ExchangeRate-API)를 쓴다.
+// 전에는 api.frankfurter.app 을 시간 제한 없이 불러서, 그 주소가 응답하지 않으면(2026-11-04) 외화 항목이 모두 합계에서 빠졌다
+const RATE_CURRENCIES = ['USD', 'EUR', 'JPY', 'TRY']
 export async function rates() {
-  try {
-    const r = await fetch('https://api.frankfurter.app/latest?from=KRW&to=USD,EUR,JPY,TRY')
-    if (!r.ok) return null
-    const j = await r.json()
-    const krw = {}
-    for (const [cur, v] of Object.entries(j.rates)) krw[cur] = 1 / v
-    return { date: j.date, krw }
-  } catch {
-    return null
-  }
+  const got = await Promise.all(RATE_CURRENCIES.map((c) => rateOn(c)))
+  const krw = {}
+  let first = null
+  got.forEach((r, i) => {
+    if (!r) return
+    krw[RATE_CURRENCIES[i]] = r.rate
+    first ??= r
+  })
+  if (!first) return null
+  return { date: first.date, krw, source: first.source }
 }
 
 // ---------------------------------------------------------------- 결제일 환율 (R-20)
@@ -21,10 +23,15 @@ export async function rates() {
 
 const cache = new Map()
 
+/** 실패(시간 초과 · 네트워크 · JSON 아님)는 null. 한 곳이 죽어도 다음 출처로 넘어가야 해서 여기서 받는다 */
 async function getJson(url) {
-  const r = await fetch(url, { signal: AbortSignal.timeout(5000) })
-  if (!r.ok) return null
-  return r.json()
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(4000) })
+    if (!r.ok) return null
+    return await r.json()
+  } catch {
+    return null
+  }
 }
 
 async function frankfurter(currency, date) {
@@ -51,12 +58,11 @@ export async function rateOn(currency, date) {
   if (currency === 'KRW') return { rate: 1, date: date ?? new Date().toISOString().slice(0, 10), source: 'KRW' }
   const key = `${currency}|${date ?? ''}`
   if (cache.has(key)) return cache.get(key)
-  let out = null
-  try {
-    out = (date && (await frankfurter(currency, date))) || (await frankfurter(currency)) || (await exchangeRateApi(currency))
-  } catch {
-    out = null
-  }
-  if (out && date) cache.set(key, out) // 지난 날짜 환율은 바뀌지 않으니 저장해 둔다
+  // 출처마다 실패가 null 로 오므로 앞이 죽어도 다음으로 넘어간다 (Frankfurter 장애 때 예비가 안 쓰이던 문제)
+  const fresh = date ? await frankfurter(currency, date) : null
+  // 날짜 조회가 실패했으면 같은 서버의 최신 조회도 실패할 가능성이 높아 예비부터 묻는다
+  const out = fresh || (date ? (await exchangeRateApi(currency)) || (await frankfurter(currency)) : (await frankfurter(currency)) || (await exchangeRateApi(currency)))
+  // 지난 날짜 환율은 바뀌지 않으니 저장해 둔다. 예비(최신 값)로 대신 채운 건 저장하지 않는다 (복구되면 결제일 값을 다시 받게)
+  if (out && date && out === fresh) cache.set(key, out)
   return out
 }
