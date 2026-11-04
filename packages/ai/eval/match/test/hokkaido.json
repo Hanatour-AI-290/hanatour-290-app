@@ -1,0 +1,280 @@
+{
+  "_note": "시험 세트. 상품 문구와 기록 문장은 직접 만든 가상 예시 (실제 상품 · 사용자 데이터 아님). items · names 는 prepare.js 가 실제 estimate() · readRecord() 로 채운다",
+  "product": "[홋카이도 삿포로·오타루·비에이 3박 4일] 상품가 1,190,000원\n\n포함: 왕복 항공, 호텔 3박, 조식\n\n불포함\n- 가이드 경비: 1인 3만 원\n- 털게 정식 저녁: 6,000엔\n\n선택관광\n- 오타루 운하 크루즈: 1,800엔\n- 조잔케이 온천 당일 입욕: 2,500엔\n- 삿포로 맥주 박물관 시음: 1,000엔\n- 비에이 청의 호수·흰수염 폭포 투어: 4,000엔\n- 스키 리프트 1일권: 6,500엔",
+  "items": [
+    {
+      "idx": 0,
+      "name": "가이드 경비",
+      "category": "가이드·기사 경비",
+      "amount": 30000,
+      "currency": "KRW",
+      "aliases": [
+        "가이드비",
+        "가이드 팁",
+        "guide fee",
+        "guide expense",
+        "ガイド料"
+      ]
+    },
+    {
+      "idx": 1,
+      "name": "털게 정식 저녁",
+      "category": "불포함 식사",
+      "amount": 6000,
+      "currency": "JPY",
+      "aliases": [
+        "털게 정식",
+        "털게 저녁",
+        "hairy crab dinner",
+        "kegani",
+        "毛ガニ",
+        "毛蟹定食"
+      ]
+    },
+    {
+      "idx": 2,
+      "name": "오타루 운하 크루즈",
+      "category": "선택관광",
+      "amount": 1800,
+      "currency": "JPY",
+      "aliases": [
+        "운하 크루즈",
+        "오타루 크루즈",
+        "Otaru Canal Cruise",
+        "小樽運河クルーズ",
+        "운하 보트"
+      ]
+    },
+    {
+      "idx": 3,
+      "name": "조잔케이 온천 당일 입욕",
+      "category": "선택관광",
+      "amount": 2500,
+      "currency": "JPY",
+      "aliases": [
+        "조잔케이 온천",
+        "온천 입욕",
+        "Jozankei Onsen",
+        "定山渓温泉",
+        "日帰り入浴",
+        "onsen"
+      ]
+    },
+    {
+      "idx": 4,
+      "name": "삿포로 맥주 박물관 시음",
+      "category": "선택관광",
+      "amount": 1000,
+      "currency": "JPY",
+      "aliases": [
+        "맥주 박물관",
+        "맥주 시음",
+        "Sapporo Beer Museum",
+        "beer tasting",
+        "サッポロビール博物館"
+      ]
+    },
+    {
+      "idx": 5,
+      "name": "비에이 청의 호수·흰수염 폭포 투어",
+      "category": "선택관광",
+      "amount": 4000,
+      "currency": "JPY",
+      "aliases": [
+        "청의 호수",
+        "흰수염 폭포",
+        "Blue Pond",
+        "Shirahige Falls",
+        "青い池",
+        "白ひげの滝"
+      ]
+    },
+    {
+      "idx": 6,
+      "name": "스키 리프트 1일권",
+      "category": "선택관광",
+      "amount": 6500,
+      "currency": "JPY",
+      "aliases": [
+        "리프트권",
+        "스키 리프트",
+        "ski lift pass",
+        "lift ticket",
+        "リフト1日券",
+        "スキー場"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "k01",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 7,200 OTARU CANAL CRUISE",
+      "amount": 7200,
+      "currency": "JPY",
+      "people": 4,
+      "answer": 2
+    },
+    {
+      "id": "k02",
+      "kind": "voice",
+      "text": "운하 보트 1800엔",
+      "amount": 1800,
+      "currency": "JPY",
+      "people": 1,
+      "answer": 2
+    },
+    {
+      "id": "k03",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 5,000 JOZANKEI ONSEN",
+      "amount": 5000,
+      "currency": "JPY",
+      "people": 2,
+      "answer": 3
+    },
+    {
+      "id": "k04",
+      "kind": "voice",
+      "text": "온천 당일치기 2500엔 냈어",
+      "amount": 2500,
+      "currency": "JPY",
+      "people": 1,
+      "answer": 3
+    },
+    {
+      "id": "k05",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 4,000 SAPPORO BEER MUSEUM",
+      "amount": 4000,
+      "currency": "JPY",
+      "people": 4,
+      "answer": 4
+    },
+    {
+      "id": "k06",
+      "kind": "voice",
+      "text": "맥주 시음 천 엔",
+      "amount": 1000,
+      "currency": "JPY",
+      "people": 1,
+      "answer": 4
+    },
+    {
+      "id": "k07",
+      "kind": "voice",
+      "text": "파란 연못 보러 가는 버스 투어 4000엔",
+      "amount": 4000,
+      "currency": "JPY",
+      "people": 1,
+      "answer": 5
+    },
+    {
+      "id": "k08",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 13,000 FURANO SKI RESORT LIFT",
+      "amount": 13000,
+      "currency": "JPY",
+      "people": 2,
+      "answer": 6
+    },
+    {
+      "id": "k09",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 24,000 KANI HONKE SAPPORO",
+      "amount": 24000,
+      "currency": "JPY",
+      "people": 4,
+      "answer": 1
+    },
+    {
+      "id": "k10",
+      "kind": "voice",
+      "text": "털게 정식 6000엔",
+      "amount": 6000,
+      "currency": "JPY",
+      "people": 1,
+      "answer": 1
+    },
+    {
+      "id": "k11",
+      "kind": "voice",
+      "text": "가이드님 3만원 드렸어",
+      "amount": 30000,
+      "currency": "KRW",
+      "people": 1,
+      "answer": 0
+    },
+    {
+      "id": "k12",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 1,800 LAWSON OTARU",
+      "amount": 1800,
+      "currency": "JPY",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "k13",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 2,500 SAPPORO RAMEN YOKOCHO",
+      "amount": 2500,
+      "currency": "JPY",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "k14",
+      "kind": "voice",
+      "text": "르타오 치즈케이크 선물 3000엔",
+      "amount": 3000,
+      "currency": "JPY",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "k15",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 JPY 1,000 SEICOMART BIEI",
+      "amount": 1000,
+      "currency": "JPY",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "k16",
+      "kind": "voice",
+      "text": "JR 오타루 왕복 열차표 1500엔",
+      "amount": 1500,
+      "currency": "JPY",
+      "people": 1,
+      "answer": null
+    }
+  ],
+  "itemsBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  },
+  "names": {
+    "k01": "오타루 운하 크루즈",
+    "k02": "운하 보트",
+    "k03": "조잔케이 온천",
+    "k04": "온천 당일치기",
+    "k05": "삿포로 맥주 박물관",
+    "k06": "맥주 시음",
+    "k07": "파란 연못 버스 투어",
+    "k08": "후라노 스키 리조트 리프트권",
+    "k09": "식사 · 카니혼케 삿포로 (게 요리)",
+    "k10": "털게 정식",
+    "k11": "가이드 팁",
+    "k12": "편의점 · 로손 오타루",
+    "k13": "삿포로 라멘 요코초",
+    "k14": "르타오 치즈케이크 선물",
+    "k15": "세이코마트 비에이 (편의점)",
+    "k16": "JR 오타루 왕복 열차표"
+  },
+  "namesBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  }
+}

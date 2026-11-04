@@ -1,0 +1,257 @@
+{
+  "_note": "시험 세트. 상품 문구와 기록 문장은 직접 만든 가상 예시 (실제 상품 · 사용자 데이터 아님). items · names 는 prepare.js 가 실제 estimate() · readRecord() 로 채운다",
+  "product": "[몽골 고비사막·테를지 5박 6일] 상품가 1,590,000원\n\n포함: 왕복 항공, 게르 캠프 3박, 호텔 2박, 전 일정 식사, 전용 차량\n\n불포함\n- 가이드/기사 경비: 1인 60달러\n\n선택관광\n- 낙타 트레킹 1시간: 30달러\n- 승마 체험: 25달러\n- 몽골 전통 공연 (마두금·흐미): 15달러\n- 사막 별 관측 투어: 20달러\n- 칭기즈칸 기마상 전망대 입장",
+  "items": [
+    {
+      "idx": 0,
+      "name": "가이드/기사 경비",
+      "category": "가이드·기사 경비",
+      "amount": 60,
+      "currency": "USD",
+      "aliases": [
+        "가이드 경비",
+        "기사 경비",
+        "가이드비",
+        "guide fee",
+        "driver fee",
+        "guide tip"
+      ]
+    },
+    {
+      "idx": 1,
+      "name": "낙타 트레킹 1시간",
+      "category": "선택관광",
+      "amount": 30,
+      "currency": "USD",
+      "aliases": [
+        "낙타 트레킹",
+        "낙타 타기",
+        "camel trekking",
+        "camel ride",
+        "тэмээ унах"
+      ]
+    },
+    {
+      "idx": 2,
+      "name": "승마 체험",
+      "category": "선택관광",
+      "amount": 25,
+      "currency": "USD",
+      "aliases": [
+        "승마",
+        "말타기",
+        "horse riding",
+        "horseback riding",
+        "морь унах"
+      ]
+    },
+    {
+      "idx": 3,
+      "name": "몽골 전통 공연 (마두금·흐미)",
+      "category": "선택관광",
+      "amount": 15,
+      "currency": "USD",
+      "aliases": [
+        "전통 공연",
+        "마두금 공연",
+        "흐미 공연",
+        "folk show",
+        "Mongolian cultural show",
+        "morin khuur",
+        "khoomei"
+      ]
+    },
+    {
+      "idx": 4,
+      "name": "사막 별 관측 투어",
+      "category": "선택관광",
+      "amount": 20,
+      "currency": "USD",
+      "aliases": [
+        "별 관측",
+        "별보기",
+        "사막 별",
+        "stargazing",
+        "star watching",
+        "night sky"
+      ]
+    },
+    {
+      "idx": 5,
+      "name": "칭기즈칸 기마상 전망대 입장",
+      "category": "선택관광",
+      "amount": null,
+      "currency": "USD",
+      "aliases": [
+        "칭기즈칸 기마상",
+        "기마상 전망대",
+        "Genghis Khan Statue",
+        "Chinggis Khaan Statue Complex",
+        "Tsonjin Boldog",
+        "Чингис хааны хөшөө"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "m01",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 120.00 GOBI CAMEL TREK",
+      "amount": 120,
+      "currency": "USD",
+      "people": 4,
+      "answer": 1
+    },
+    {
+      "id": "m02",
+      "kind": "voice",
+      "text": "낙타 탔어 30달러",
+      "amount": 30,
+      "currency": "USD",
+      "people": 1,
+      "answer": 1
+    },
+    {
+      "id": "m03",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 50.00 TERELJ HORSE RIDING",
+      "amount": 50,
+      "currency": "USD",
+      "people": 2,
+      "answer": 2
+    },
+    {
+      "id": "m04",
+      "kind": "voice",
+      "text": "말 타기 25불",
+      "amount": 25,
+      "currency": "USD",
+      "people": 1,
+      "answer": 2
+    },
+    {
+      "id": "m05",
+      "kind": "voice",
+      "text": "마두금 공연 15달러",
+      "amount": 15,
+      "currency": "USD",
+      "people": 1,
+      "answer": 3
+    },
+    {
+      "id": "m06",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 30.00 TUMEN EKH ENSEMBLE",
+      "amount": 30,
+      "currency": "USD",
+      "people": 2,
+      "answer": 3
+    },
+    {
+      "id": "m07",
+      "kind": "voice",
+      "text": "밤에 은하수 보러 가는 투어 20달러",
+      "amount": 20,
+      "currency": "USD",
+      "people": 1,
+      "answer": 4
+    },
+    {
+      "id": "m08",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 40.00 CHINGGIS KHAAN STATUE COMPLEX",
+      "amount": 40,
+      "currency": "USD",
+      "people": 4,
+      "answer": 5
+    },
+    {
+      "id": "m09",
+      "kind": "voice",
+      "text": "가이드랑 기사님 경비 60달러",
+      "amount": 60,
+      "currency": "USD",
+      "people": 1,
+      "answer": 0
+    },
+    {
+      "id": "m10",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 30.00 STATE DEPARTMENT STORE",
+      "amount": 30,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "m11",
+      "kind": "voice",
+      "text": "캐시미어 목도리 80달러",
+      "amount": 80,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "m12",
+      "kind": "voice",
+      "text": "게르에서 보드카 한 병 15달러",
+      "amount": 15,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "m13",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 25.00 MODERN NOMADS RESTAURANT",
+      "amount": 25,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "m14",
+      "kind": "voice",
+      "text": "말 모양 기념품 20달러",
+      "amount": 20,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "m15",
+      "kind": "voice",
+      "text": "생수 한 박스 5달러",
+      "amount": 5,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    }
+  ],
+  "itemsBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  },
+  "names": {
+    "m01": "고비 낙타 트레킹",
+    "m02": "낙타 타기",
+    "m03": "테를지 승마",
+    "m04": "말 타기",
+    "m05": "마두금 공연",
+    "m06": "투멘 에흐 공연 (몽골 전통 공연)",
+    "m07": "은하수 야간 투어",
+    "m08": "칭기즈칸 동상 단지",
+    "m09": "가이드·기사님 경비",
+    "m10": "쇼핑 · 스테이트 백화점",
+    "m11": "캐시미어 목도리",
+    "m12": "보드카 한 병 · 게르",
+    "m13": "식사 · 모던 노마즈 레스토랑",
+    "m14": "말 모양 기념품",
+    "m15": "생수 한 박스"
+  },
+  "namesBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  }
+}

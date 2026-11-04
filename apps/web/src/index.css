@@ -367,6 +367,8 @@ img { display: block; }
 
 /* 중복 결제 (R-14) · 영수증 줄 확인 카드 (R-10) */
 .dup { margin-top: 10px; padding: 11px 12px; border-radius: 12px; background: #fff8e1; font-size: 13px; font-weight: 600; }
+/* 예정 항목 연결 후보 (ML 임베딩) - 경고가 아니라 제안이라 브랜드 연한 색 */
+.dup.plan { background: var(--tint); color: var(--ink); }
 .lines { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 4px; }
 .ln { padding: 8px 0; border-bottom: 1px solid #f1f2f4; }
 .ln .t { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }

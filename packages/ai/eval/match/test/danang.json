@@ -1,0 +1,282 @@
+{
+  "_note": "시험 세트. 상품 문구와 기록 문장은 직접 만든 가상 예시 (실제 상품 · 사용자 데이터 아님). items · names 는 prepare.js 가 실제 estimate() · readRecord() 로 채운다",
+  "product": "[다낭·호이안 4박 6일] 상품가 699,000원\n\n포함: 왕복 항공, 리조트 4박, 일정표상 식사\n\n불포함\n- 가이드/기사 경비: 1인 50달러 (현지 지불)\n- 미케비치 씨푸드 디너: 35달러\n\n선택관광 (현지 신청)\n- 바나힐 테마파크 + 골든브릿지: 60달러\n- 호이안 바구니배 체험: 20달러\n- 마블마운틴(오행산) 투어: 25달러\n- 전신 마사지 90분: 40달러\n- 호이안 야간 시클로: 15달러",
+  "items": [
+    {
+      "idx": 0,
+      "name": "가이드/기사 경비",
+      "category": "가이드·기사 경비",
+      "amount": 50,
+      "currency": "USD",
+      "aliases": [
+        "가이드 경비",
+        "기사 경비",
+        "가이드비",
+        "guide fee",
+        "driver fee",
+        "guide tip"
+      ]
+    },
+    {
+      "idx": 1,
+      "name": "미케비치 씨푸드 디너",
+      "category": "불포함 식사",
+      "amount": 35,
+      "currency": "USD",
+      "aliases": [
+        "씨푸드 디너",
+        "해산물 저녁",
+        "미케비치 해산물",
+        "seafood dinner",
+        "My Khe seafood",
+        "hải sản"
+      ]
+    },
+    {
+      "idx": 2,
+      "name": "바나힐 테마파크 + 골든브릿지",
+      "category": "선택관광",
+      "amount": 60,
+      "currency": "USD",
+      "aliases": [
+        "바나힐",
+        "골든브릿지",
+        "Ba Na Hills",
+        "Golden Bridge",
+        "Sun World Ba Na",
+        "Cầu Vàng"
+      ]
+    },
+    {
+      "idx": 3,
+      "name": "호이안 바구니배 체험",
+      "category": "선택관광",
+      "amount": 20,
+      "currency": "USD",
+      "aliases": [
+        "바구니배",
+        "코코넛 배",
+        "basket boat",
+        "coconut boat",
+        "thúng chai",
+        "Bay Mau"
+      ]
+    },
+    {
+      "idx": 4,
+      "name": "마블마운틴(오행산) 투어",
+      "category": "선택관광",
+      "amount": 25,
+      "currency": "USD",
+      "aliases": [
+        "마블마운틴",
+        "오행산",
+        "Marble Mountains",
+        "Ngũ Hành Sơn",
+        "Ngu Hanh Son"
+      ]
+    },
+    {
+      "idx": 5,
+      "name": "전신 마사지 90분",
+      "category": "선택관광",
+      "amount": 40,
+      "currency": "USD",
+      "aliases": [
+        "마사지",
+        "전신마사지",
+        "스파",
+        "massage",
+        "spa",
+        "body massage"
+      ]
+    },
+    {
+      "idx": 6,
+      "name": "호이안 야간 시클로",
+      "category": "선택관광",
+      "amount": 15,
+      "currency": "USD",
+      "aliases": [
+        "시클로",
+        "씨클로",
+        "야간 시클로",
+        "cyclo",
+        "xích lô",
+        "cyclo ride"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "d01",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 240.00 SUN WORLD BA NA HILLS",
+      "amount": 240,
+      "currency": "USD",
+      "people": 4,
+      "answer": 2
+    },
+    {
+      "id": "d02",
+      "kind": "voice",
+      "text": "바나힐 케이블카 표 60달러",
+      "amount": 60,
+      "currency": "USD",
+      "people": 1,
+      "answer": 2
+    },
+    {
+      "id": "d03",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 80.00 HOI AN BASKET BOAT TOUR",
+      "amount": 80,
+      "currency": "USD",
+      "people": 4,
+      "answer": 3
+    },
+    {
+      "id": "d04",
+      "kind": "voice",
+      "text": "코코넛 배 타는 거 20불 냈어",
+      "amount": 20,
+      "currency": "USD",
+      "people": 1,
+      "answer": 3
+    },
+    {
+      "id": "d05",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 50.00 NGU HANH SON TICKET",
+      "amount": 50,
+      "currency": "USD",
+      "people": 2,
+      "answer": 4
+    },
+    {
+      "id": "d06",
+      "kind": "voice",
+      "text": "오행산 동굴 구경 25달러",
+      "amount": 25,
+      "currency": "USD",
+      "people": 1,
+      "answer": 4
+    },
+    {
+      "id": "d07",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 160.00 HERBAL SPA DA NANG",
+      "amount": 160,
+      "currency": "USD",
+      "people": 4,
+      "answer": 5
+    },
+    {
+      "id": "d08",
+      "kind": "voice",
+      "text": "밤에 씨클로 타고 올드타운 한 바퀴 15불",
+      "amount": 15,
+      "currency": "USD",
+      "people": 1,
+      "answer": 6
+    },
+    {
+      "id": "d09",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 140.00 BE MAN SEAFOOD MY KHE",
+      "amount": 140,
+      "currency": "USD",
+      "people": 4,
+      "answer": 1
+    },
+    {
+      "id": "d10",
+      "kind": "voice",
+      "text": "가이드님 경비 50달러 드림",
+      "amount": 50,
+      "currency": "USD",
+      "people": 1,
+      "answer": 0
+    },
+    {
+      "id": "d11",
+      "kind": "voice",
+      "text": "네일 케어 15달러",
+      "amount": 15,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "d12",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 35.00 HIGHLANDS COFFEE",
+      "amount": 35,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "d13",
+      "kind": "voice",
+      "text": "그랩 택시 12달러",
+      "amount": 12,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "d14",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 60.00 VINCOM PLAZA DA NANG",
+      "amount": 60,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "d15",
+      "kind": "voice",
+      "text": "호이안 등불 기념품 10달러",
+      "amount": 10,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    },
+    {
+      "id": "d16",
+      "kind": "sms",
+      "text": "[Web발신] 해외승인 USD 25.00 BANH MI PHUONG HOI AN",
+      "amount": 25,
+      "currency": "USD",
+      "people": 1,
+      "answer": null
+    }
+  ],
+  "itemsBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  },
+  "names": {
+    "d01": "선월드 바나힐",
+    "d02": "바나힐 케이블카 표",
+    "d03": "호이안 바구니배 투어",
+    "d04": "코코넛 배 타기",
+    "d05": "응우한썬(오행산) 입장권",
+    "d06": "오행산 동굴 구경",
+    "d07": "다낭 허벌 스파",
+    "d08": "씨클로 올드타운 투어",
+    "d09": "식사 · 미케 해산물 식당",
+    "d10": "가이드 경비",
+    "d11": "네일 케어",
+    "d12": "하이랜드 커피",
+    "d13": "그랩 택시",
+    "d14": "빈컴 플라자 다낭 쇼핑",
+    "d15": "호이안 등불 기념품",
+    "d16": "반미프엉 (호이안 반미)"
+  },
+  "namesBy": {
+    "model": "claude-opus-5-5",
+    "date": "2026-11-04"
+  }
+}

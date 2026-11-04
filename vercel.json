@@ -3,5 +3,12 @@
   "framework": null,
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
-  "outputDirectory": "apps/web/dist"
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [{ "source": "/api/:path*", "destination": "/api" }],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "excludeFiles": "{node_modules/onnxruntime-node/bin/napi-v*/{darwin,win32}/**,node_modules/onnxruntime-node/bin/napi-v*/linux/arm64/**,node_modules/onnxruntime-web/dist/*.map}"
+    }
+  }
 }

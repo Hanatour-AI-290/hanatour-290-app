@@ -1,0 +1,34 @@
+{
+  "_note": "확인용(holdout) 세트. 방식 · 문턱값을 cases.json 으로 정한 뒤 마지막에 한 번만 잰다. 직접 만든 예시 (실제 사용자 데이터 아님). items 는 cases.json 과 같은 시연 상품",
+  "items": [
+    { "idx": 0, "name": "가이드/기사 경비", "category": "가이드·기사 경비", "amount": 100000, "currency": "KRW" },
+    { "idx": 1, "name": "카파도키아 열기구 투어", "category": "선택관광", "amount": 320, "currency": "EUR" },
+    { "idx": 2, "name": "고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전)", "category": "선택관광", "amount": 180, "currency": "EUR" },
+    { "idx": 3, "name": "안탈리아 유람선 투어", "category": "선택관광", "amount": 60, "currency": "EUR" },
+    { "idx": 4, "name": "카트 투어", "category": "선택관광", "amount": 60, "currency": "EUR" },
+    { "idx": 5, "name": "지프 사파리", "category": "선택관광", "amount": null, "currency": null },
+    { "idx": 6, "name": "보스포루스 야경 투어", "category": "선택관광", "amount": null, "currency": null }
+  ],
+  "cases": [
+    { "id": "h01", "kind": "sms", "text": "[Web발신] 해외승인 EUR 640.00 URGUP BALLOON FLIGHTS", "amount": 640, "currency": "EUR", "people": 2, "answer": 1 },
+    { "id": "h02", "kind": "voice", "text": "새벽에 풍선 타는 거 320유로 냈어", "amount": 320, "currency": "EUR", "people": 1, "answer": 1 },
+    { "id": "h03", "kind": "sms", "text": "[Web발신] 해외승인 EUR 180.00 YEREBATAN SARNICI TOUR", "amount": 180, "currency": "EUR", "people": 1, "answer": 2 },
+    { "id": "h04", "kind": "voice", "text": "돌마바흐체 궁전 투어 셋이 540유로", "amount": 540, "currency": "EUR", "people": 3, "answer": 2 },
+    { "id": "h05", "kind": "sms", "text": "[Web발신] 해외승인 EUR 120.00 MANAVGAT BOAT TOUR", "amount": 120, "currency": "EUR", "people": 2, "answer": 3 },
+    { "id": "h06", "kind": "voice", "text": "크루즈 타고 지중해 구경 60유로", "amount": 60, "currency": "EUR", "people": 1, "answer": 3 },
+    { "id": "h07", "kind": "sms", "text": "[Web발신] 해외승인 EUR 240.00 KARTING CENTER ANTALYA", "amount": 240, "currency": "EUR", "people": 4, "answer": 4 },
+    { "id": "h08", "kind": "voice", "text": "레이싱 카트 60유로 카드", "amount": 60, "currency": "EUR", "people": 1, "answer": 4 },
+    { "id": "h09", "kind": "sms", "text": "[Web발신] 해외승인 TRY 3,000.00 GOREME JEEP TOUR", "amount": 3000, "currency": "TRY", "people": 2, "answer": 5 },
+    { "id": "h10", "kind": "voice", "text": "사륜구동 차 타고 계곡 투어 1500리라", "amount": 1500, "currency": "TRY", "people": 1, "answer": 5 },
+    { "id": "h11", "kind": "sms", "text": "[Web발신] 해외승인 TRY 1,900.00 BOSPHORUS NIGHT CRUISE", "amount": 1900, "currency": "TRY", "people": 1, "answer": 6 },
+    { "id": "h12", "kind": "voice", "text": "이스탄불 밤바다 야경 배 2000리라", "amount": 2000, "currency": "TRY", "people": 1, "answer": 6 },
+    { "id": "h13", "kind": "voice", "text": "기사님 수고비 10만원 드렸어", "amount": 100000, "currency": "KRW", "people": 1, "answer": 0 },
+    { "id": "h14", "kind": "sms", "text": "[Web발신] 해외승인 TRY 480.00 SIMIT SARAYI", "amount": 480, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "h15", "kind": "sms", "text": "[Web발신] 해외승인 EUR 60.00 ANTALYA AQUARIUM", "amount": 60, "currency": "EUR", "people": 1, "answer": null },
+    { "id": "h16", "kind": "sms", "text": "[Web발신] 해외승인 TRY 750.00 MADO DONDURMA", "amount": 750, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "h17", "kind": "voice", "text": "버스표 두 장 400리라", "amount": 400, "currency": "TRY", "people": 2, "answer": null },
+    { "id": "h18", "kind": "voice", "text": "하맘 마사지 50유로", "amount": 50, "currency": "EUR", "people": 1, "answer": null },
+    { "id": "h19", "kind": "voice", "text": "열기구 사진 액자 기념품 800리라", "amount": 800, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "h20", "kind": "sms", "text": "[Web발신] 해외승인 EUR 35.00 GALATA KULESI", "amount": 35, "currency": "EUR", "people": 1, "answer": null }
+  ]
+}

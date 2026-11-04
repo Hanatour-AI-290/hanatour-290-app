@@ -278,6 +278,36 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 
 응답 `{ "duplicates": [{ "id": "e1", "amountDiff": 300, "minutesApart": 2, "sameMerchant": true }] }` (`sameMerchant: null` = 가게 이름을 비교하지 못함)
 
+## POST /match/plan
+
+새 기록(카드 문자 · 말 · 영수증)이 일정의 예정 항목(선택관광 · 경비)과 같은 지출인지 후보를 찾는다. 화면은 후보가 있으면 "‘카파도키아 열기구 투어’ 예정 지출인가요?" 를 묻고, 사용자가 "맞아요" 를 누를 때만 일정 항목을 "했다" 로 바꾼다.
+Claude 를 부르지 않는다. 이름 비교는 서버 안의 문장 임베딩 모델(`Xenova/multilingual-e5-small`), 통화 · 금액과 후보 결정은 `packages/shared/src/match.js` 규칙.
+
+요청
+```json
+{
+  "record": { "text": "괴레메 열기구 투어", "amount": 320, "currency": "EUR", "people": 1 },
+  "items": [
+    { "idx": 1, "name": "카파도키아 열기구 투어", "aliases": ["열기구", "hot air balloon", "balon turu"], "amount": 320, "currency": "EUR" },
+    { "idx": 5, "name": "지프 사파리", "amount": null, "currency": null }
+  ]
+}
+```
+- `record.text`: 기록 이름 (화면은 Claude 가 만든 `name`, 1~500자). `amount` 는 화면 단위(소수)
+- `items`: 아직 "했다" 가 아니고 예산에 넣은 일정 항목 (최대 50개). `idx` = `/estimate` 의 `items` 번호, `aliases` = `/estimate` 가 만든 다른 이름 (최대 12개, 길면 잘라 씀)
+- 이름 비교 전에 "투어" 같은 흔한 말을 양쪽에서 빼고, 항목은 이름 · 별칭 중 가장 가까운 값을 쓴다
+
+응답 `{ "candidates": [{ "idx": 1, "score": 0.922, "sim": 0.902, "amountMatch": true }], "model": "Xenova/multilingual-e5-small" }`
+
+| 규칙 | 값 |
+| --- | --- |
+| 통화 | 둘 다 아는데 다르면 후보에서 뺀다 |
+| 금액 일치 (`amountMatch`) | 기록 금액 = 항목 1인 금액 또는 × 인원 (1% 이내) → 점수 +0.02 |
+| 후보 조건 | 점수 0.87 이상, 2등과 0.01 이상 차이 (애매하면 묻지 않는다), 이름 유사도 0.86 이상 (금액만 같은 다른 가게는 잇지 않는다) |
+
+- 후보는 0개 또는 1개. 모델을 못 불러오면 `{ "candidates": [], "model": null }` (기록 흐름을 막지 않음)
+- 첫 호출은 모델을 받느라 느리다 (Vercel 측정 6.9초, 이후 0.4초)
+
 ## POST /budget
 
 하루 예산 (R-03) = (예상 비용에 넣은 항목의 1인 금액 합 + 하루 생활비 × 일수) ÷ 일수.
