@@ -2,7 +2,8 @@
 
 /**
  * @param {{ lines: { name?: string, nameKo?: string, kind?: string, qty: number, unitPrice: number, total: number }[], total: number,
- *           splits?: { lineIndex: number, memberIds: string[] }[], memberIds?: string[] }} r
+ *           splits?: { lineIndex: number, memberIds: string[] }[], memberIds?: string[],
+ *           payers?: { memberId: string, amount: number | null }[] }} r
  * @returns {{ ok: boolean, errors: string[] }}
  */
 export function validate(r) {
@@ -16,6 +17,15 @@ export function validate(r) {
   r.lines.forEach((l, i) => {
     if (l.qty * l.unitPrice !== l.total) errors.push(`${i}번 줄: ${l.qty}×${l.unitPrice} ≠ ${l.total}`)
   })
+
+  // 결제자가 낸 금액 합 = 영수증 합계 (FR-009). 금액을 모르는 결제자가 있으면 맞는지 알 수 없다
+  if (r.payers?.length) {
+    if (r.payers.some((p) => p.amount == null)) errors.push('결제자가 각각 얼마 냈는지 몰라요')
+    else {
+      const paid = r.payers.reduce((s, p) => s + p.amount, 0)
+      if (paid !== r.total) errors.push(`결제자가 낸 금액 합 ${paid} ≠ 영수증 합계 ${r.total}`)
+    }
+  }
 
   // 줄별 배정. splits 에 없는 줄은 기본 1/N 이라 "배정 안 된 줄"은 오류가 아니다 (R-24)
   const seen = new Set()

@@ -68,3 +68,15 @@ test('영수증 줄 합 ≠ 총액이면 차액 줄을 넣어 서버 검사를 �
   assert.deepEqual(e.lines[2], { name: '읽지 못한 차액', kind: 'tax', qty: 1, unitPrice: 16000, total: 16000 })
   assert.equal(e.lines.reduce((a, l) => a + l.total, 0), e.total.amount)
 })
+
+test('AI 가 읽은 결제자 여러 명 → 화면 기록의 payers (FR-008)', async () => {
+  const { splitPayers } = await import('../src/api.js')
+  assert.deepEqual(splitPayers([{ name: '지우', amount: 2000 }, { name: '하린', amount: 1560 }], 'card'), [
+    { name: '지우', amount: 2000, method: 'card' },
+    { name: '하린', amount: 1560, method: 'card' },
+  ])
+  // 한 명이거나, 금액을 모르는 사람이 있으면 나눠 낸 것으로 넣지 않는다 (확인 카드 질문으로)
+  assert.equal(splitPayers([{ name: '지우', amount: 3560 }], 'card'), undefined)
+  assert.equal(splitPayers([{ name: '지우', amount: null }, { name: '하린', amount: null }], 'card'), undefined)
+  assert.equal(splitPayers(undefined, 'card'), undefined)
+})

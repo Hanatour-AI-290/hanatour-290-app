@@ -2,10 +2,15 @@
 // AI 는 이름으로 답하고, 이름 → memberId 변환과 명단 밖 이름 거르기는 코드가 한다 (R-25 추측 금지).
 import { z } from 'zod'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
+import { minorDigits } from '@h290/shared'
 import { getClient, MODEL } from './client.js'
+import { resolvePayers } from './payers.js'
 
 export const AssignResult = z.object({
-  payer: z.string().nullable().describe('돈을 낸 사람 이름. 말에 없으면 null'),
+  payers: z.array(z.object({
+    name: z.string().describe('돈을 낸 사람 이름'),
+    amount: z.number().nullable().describe('그 사람이 낸 금액을 영수증 통화 소수로 (예: 2000). 말에 금액이 없으면 null'),
+  })).describe('돈을 낸 사람들 (FR-008). 여러 명이 나눠 냈으면 모두. 말에 없으면 빈 배열'),
   splits: z.array(z.object({
     lineIndex: z.number().int().describe('줄 번호 (0부터)'),
     names: z.array(z.string()).describe('그 줄을 나눌 사람 이름들'),
@@ -23,13 +28,16 @@ const SYSTEM = (members, me) => `너는 여행 영수증을 동행끼리 나누�
 - "누구는 술 빼고"처럼 빼라고 하면 해당 줄에서 그 사람을 뺀다. 술은 맥주·와인·라크·Efes·Bira 같은 줄이다.
 - 메뉴 이름이 현지어여도 nameKo(한국어)로 어떤 줄인지 판단한다.
 - 동행 명단에 없는 이름은 쓰지 않는다. 어느 줄인지 애매하면 추측하지 말고 questions 에 넣는다.
-- 세금 줄(kind=tax)은 splits 에 넣지 않는다. 몫 비율대로 나누는 건 서버가 한다.`
+- 세금 줄(kind=tax)은 splits 에 넣지 않는다. 몫 비율대로 나누는 건 서버가 한다.
+- 결제자는 말에 나온 사람만 payers 에 넣는다. "지우가 2000, 나머지는 하린"처럼 금액을 말했으면 그 금액, "반씩"처럼 나누는 방법만 말했으면 그대로 계산한 금액, 금액 말이 없으면 null.`
 
 /**
- * @param {{ lines: { name: string, nameKo?: string, kind?: string, total: number }[], members: { id: string, name: string }[], utterance: string, me?: string }} input
- * @returns {Promise<{ payerId: string | null, splits: { lineIndex: number, memberIds: string[], source?: string }[], questions: { lineIndex?: number, field: string, text: string }[] }>}
+ * @param {{ lines: { name: string, nameKo?: string, kind?: string, total: number }[], members: { id: string, name: string }[], utterance: string, me?: string,
+ *           currency: string, total: number, hint?: string[] }} input  total = 영수증 합계 (최소 단위), hint = 지난번에 틀린 점 (재시도 때)
+ * @returns {Promise<{ payerId: string | null, payers: { memberId: string, amount: number | null }[], splits: { lineIndex: number, memberIds: string[], source?: string }[], questions: { lineIndex?: number, field: string, text: string }[] }>}
+ *   payerId = 첫 결제자 (없으면 null), payers 금액은 최소 단위
  */
-export async function assignLines({ lines, members, utterance, me }) {
+export async function assignLines({ lines, members, utterance, me, currency, total, hint = [] }) {
   const names = members.map((m) => m.name)
   const meName = me ?? names[0]
   const table = lines.map((l, i) => `${i}. ${l.nameKo || l.name} (${l.name}) ${l.kind === 'tax' ? '[세금]' : ''}`).join('\n')
@@ -39,7 +47,7 @@ export async function assignLines({ lines, members, utterance, me }) {
     max_tokens: 4000,
     output_config: { effort: 'low', format: zodOutputFormat(AssignResult) },
     system: SYSTEM(names, meName),
-    messages: [{ role: 'user', content: `<영수증줄>\n${table}\n</영수증줄>\n<말>${utterance || '(말 없음)'}</말>` }],
+    messages: [{ role: 'user', content: `<영수증줄>\n${table}\n</영수증줄>\n<말>${utterance || '(말 없음)'}</말>${retryNote(hint)}` }],
   })
   if (resp.stop_reason === 'refusal' || !resp.parsed_output) throw new Error('나눌 사람을 정하지 못했어요')
 
@@ -56,5 +64,18 @@ export async function assignLines({ lines, members, utterance, me }) {
     if (unknown.length) questions.push({ lineIndex: s.lineIndex, field: 'memberIds', text: `${line.nameKo || line.name}: 명단에 없는 이름(${unknown.join(', ')})이 있어요. 누가 낼까요?` })
     if (memberIds.length) splits.push({ lineIndex: s.lineIndex, memberIds, source: s.source })
   }
-  return { payerId: out.payer ? idOf[out.payer] ?? null : null, splits, questions }
+
+  // 결제자: AI 가 읽은 소수 금액 → 최소 단위, 금액 맞추기는 resolvePayers (코드)
+  const scale = 10 ** minorDigits(currency)
+  const paid = resolvePayers({
+    payers: out.payers.map((p) => ({ name: p.name, amount: p.amount == null ? null : Math.round(p.amount * scale) })),
+    names,
+    total,
+  })
+  for (const text of paid.questions) questions.push({ field: 'payers', text })
+  const payers = paid.payers.map((p) => ({ memberId: idOf[p.name], amount: p.amount }))
+  return { payerId: payers[0]?.memberId ?? null, payers, splits, questions }
 }
+
+/** 재시도 때 틀린 점을 말 뒤에 붙인다 (FR-009) */
+const retryNote = (hint) => (hint.length ? `\n지난번 결과가 틀렸다. 다시 정해 줘.\n틀린 점:\n${hint.map((h) => `- ${h}`).join('\n')}` : '')

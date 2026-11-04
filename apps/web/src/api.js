@@ -106,6 +106,17 @@ export function confirmFor(people, payer, prev = {}) {
 /** 결제자 이름들 (여러 명이 나눠 냈으면 모두) */
 export const payerNames = (r) => (r.payers?.length > 1 ? r.payers.map((p) => p.name) : r.payer ? [r.payer] : [])
 
+/**
+ * AI 가 읽은 결제자 목록 → 화면 기록의 payers (FR-008). 두 명 이상이고 모두 금액을 알 때만.
+ * 금액을 모르면 넣지 않는다 (AI 쪽에서 이미 질문으로 넘김, 사용자가 정산 화면에서 고친다)
+ * @param {{ name: string, amount: number | null }[] | undefined} list 금액은 소수 (₺2,000 → 2000)
+ * @param {'card' | 'cash'} method
+ */
+export function splitPayers(list, method) {
+  if (!list || list.length < 2 || list.some((p) => p.amount == null || !p.name)) return undefined
+  return list.map((p) => ({ name: p.name, amount: p.amount, method }))
+}
+
 /* ---------- API 호출 ---------- */
 
 async function request(url, init) {

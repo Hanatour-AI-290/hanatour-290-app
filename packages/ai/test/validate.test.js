@@ -57,3 +57,16 @@ test('배정된 사람이 없으면 실패', () => {
   assert.equal(r.ok, false)
   assert.match(r.errors[0], /Çay.*낼 사람이 없/)
 })
+
+test('결제자가 낸 금액 합이 총액과 다르면 실패 (FR-009)', () => {
+  const r = validate({ lines, total: 2200, payers: [{ memberId: 'a', amount: 1000 }, { memberId: 'b', amount: 1000 }] })
+  assert.equal(r.ok, false)
+  assert.match(r.errors[0], /결제자.*2000.*2200/)
+})
+
+test('결제자 금액 합이 맞으면 통과, 금액을 모르는 결제자가 있으면 실패', () => {
+  assert.equal(validate({ lines, total: 2200, payers: [{ memberId: 'a', amount: 1200 }, { memberId: 'b', amount: 1000 }] }).ok, true)
+  const r = validate({ lines, total: 2200, payers: [{ memberId: 'a', amount: null }, { memberId: 'b', amount: null }] })
+  assert.equal(r.ok, false)
+  assert.match(r.errors[0], /얼마/)
+})

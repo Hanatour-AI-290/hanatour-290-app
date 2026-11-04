@@ -63,7 +63,8 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 ## POST /record
 
 요청 `{ "text"?: "말 한 줄 (500자 이하)", "image"?: "data:image/jpeg;base64,...", "kind"?: "sms", "members": ["지우", ...], "me": "지우" }`
-응답 `{ "name", "category", "amount", "currency", "payer", "people": [], "evidence" }` - 팀원 이름이 아닌 payer·people 은 서버가 버린다.
+응답 `{ "name", "category", "amount", "currency", "payer", "payers": [], "people": [], "evidence" }` - 팀원 이름이 아닌 payer·payers·people 은 서버가 버린다.
+`payers` 는 결제자들 `[{ name, amount }]` (소수, FR-008). 한 명이면 총액, 금액을 모르는 사람이 한 명이면 나머지 금액, 둘 이상이면 amount null. 화면은 두 명 이상이고 금액을 다 알 때만 나눠 낸 것으로 넣는다.
 
 이 응답을 정산에 쓰려면 화면이 `Expense` 로 바꿔서 `/settle` 에 보낸다.
 `amount` 는 소수(예: `620`) 이므로 최소 단위로 바꾸고 (`62000`), `payer` → `payers`, `people` → `memberIds` (이름 → 멤버 id).
@@ -343,7 +344,7 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 
 요청 (multipart): `image` 파일 (jpg · png · webp · gif, 3MB 이하), `utterance` 문자열 (500자 이하), `members` JSON 문자열 `[{"id":"m1","name":"지우"}, ...]`, `me` 올린 사람 이름 (선택, 기본 첫 멤버)
 
-응답에는 아래 예시 외에 `payerId`(말에서 찾은 결제자 id, 없으면 null)와 `retried`(다시 읽었는지)가 더 붙는다. `receipt` 에는 `merchant` · `paidAt` · `category`(식사·선택관광·교통·쇼핑·팁·기타, FR-018) 도 있다.
+응답에는 아래 예시 외에 `payerId`(첫 결제자 id, 없으면 null), `payers`(결제자들 `[{ memberId, amount }]`, 금액은 최소 단위, 여러 명이 금액을 말하지 않았으면 amount null + 질문, FR-008)와 `retried`(다시 읽었는지)가 더 붙는다. `receipt` 에는 `merchant` · `paidAt` · `category`(식사·선택관광·교통·쇼핑·팁·기타, FR-018) 도 있다.
 
 응답 예시:
 
@@ -365,7 +366,7 @@ Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 �
 
 - `lines[].source`: 영수증에서 읽은 원문, `splits[].source`: 배정 근거가 된 말 원문 (확인 카드에 줄마다 표시)
 - `questions`: AI 가 모르는 칸. 비어 있지 않으면 확인 카드에 질문으로 띄운다
-- `check.errors`: 규칙 검사(AI 안 씀)에서 남은 오류. 줄 합계 ≠ 합계, 수량 × 단가 ≠ 줄 금액, 없는 줄·세금 줄에 배정, 같은 줄 두 번 배정, 낼 사람 없는 배정, 명단에 없는 멤버. 남은 오류는 `questions` 에도 붙는다. `splits` 에 없는 줄은 기본 1/N 이라 오류가 아니다
+- `check.errors`: 규칙 검사(AI 안 씀)에서 남은 오류. 줄 합계 ≠ 합계, 결제자 금액 합 ≠ 합계, 수량 × 단가 ≠ 줄 금액, 없는 줄·세금 줄에 배정, 같은 줄 두 번 배정, 낼 사람 없는 배정, 명단에 없는 멤버. 남은 오류는 `questions` 에도 붙는다. `splits` 에 없는 줄은 기본 1/N 이라 오류가 아니다
 
 ## Expense (지출 한 건)
 
