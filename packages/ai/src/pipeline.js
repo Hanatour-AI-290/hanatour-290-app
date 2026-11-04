@@ -36,6 +36,17 @@ export function explain(receipt, errors) {
   return { hints, questions }
 }
 
+/** 사진에서 영수증 줄을 하나도 못 읽었을 때 (영수증이 아닌 사진, 너무 흐린 사진). 라우트가 422 로 바꾸고 화면은 직접 입력으로 넘긴다 (AVL-003) */
+export class UnreadableReceipt extends Error {
+  constructor() {
+    super('영수증을 읽지 못했어요')
+    this.name = 'UnreadableReceipt'
+  }
+}
+
+/** 읽은 게 영수증이라고 볼 수 있는지: 메뉴 줄이 하나 이상, 합계가 0보다 큼. 아니면 AI 가 채운 통화·합계는 지어낸 값이라 쓰지 않는다 (R-25) */
+export const isReadable = (receipt) => receipt.total > 0 && receipt.lines.some((l) => l.kind !== 'tax')
+
 /**
  * @param {{ image: string, mediaType: string, utterance: string, members: { id: string, name: string }[], me?: string, retry?: boolean }} input
  * @returns {Promise<{ receipt: object, payerId: string | null, payers: { memberId: string, amount: number | null }[], splits: object[], questions: object[], check: { ok: boolean, errors: string[] }, retried: boolean }>}
@@ -43,11 +54,14 @@ export function explain(receipt, errors) {
  */
 export async function runPipeline({ image, mediaType, utterance, members, me, retry = true }) {
   let receipt = await readReceipt({ image, mediaType })
+  if (!isReadable(receipt)) throw new UnreadableReceipt()
   let check = validate(receipt)
   let retried = false
   if (!check.ok && retry) {
     // 틀린 점을 알려 주고 한 번만 다시 읽힌다
-    receipt = await readReceipt({ image, mediaType, hint: explain(receipt, check.errors).hints })
+    const again = await readReceipt({ image, mediaType, hint: explain(receipt, check.errors).hints })
+    // 다시 읽은 결과가 오히려 비었으면 처음 결과를 쓴다
+    if (isReadable(again)) receipt = again
     check = validate(receipt)
     retried = true
   }
@@ -66,9 +80,13 @@ export async function runPipeline({ image, mediaType, utterance, members, me, re
   }
 
   // 그래도 남은 오류는 사용자에게 묻는다 (추측해서 고치지 않음). 결제자 질문은 배정 단계에서 이미 냈으면 겹치지 않게
-  const { payerId, payers, splits, questions } = a
+  const { payerId, payers, splits } = a
+  let { questions } = a
+  const server = explain(receipt, check.errors).questions
+  // 서버 검사가 결제자 금액을 물으면, AI 가 같은 내용을 줄 번호 없이 따로 물은 질문은 뺀다 (같은 질문이 두 번 뜨던 문제)
+  if (server.some((q) => q.field === 'payers')) questions = questions.filter((q) => !(q.lineIndex == null && /냈|결제|금액|합계/.test(q.text)))
   const asked = new Set(questions.map((q) => q.field))
-  questions.push(...explain(receipt, check.errors).questions.filter((q) => !(q.field === 'payers' && asked.has('payers'))))
+  questions.push(...server.filter((q) => !(q.field === 'payers' && asked.has('payers'))))
 
   return { receipt, payerId, payers, splits, questions, check, retried }
 }

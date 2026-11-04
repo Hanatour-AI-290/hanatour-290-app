@@ -1,7 +1,7 @@
 export { Anthropic, MODEL } from './client.js'
 export { estimate } from './estimate.js'
 export { readRecord } from './record.js'
-export { runPipeline } from './pipeline.js'
+export { runPipeline, UnreadableReceipt, isReadable } from './pipeline.js'
 export { readReceipt } from './readReceipt.js'
 export { assignLines } from './assign.js'
 export { validate } from './validate.js'
