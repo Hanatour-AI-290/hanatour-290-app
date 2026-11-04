@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { Anthropic } from '@h290/ai'
 import { requestLog } from './lib/log.js'
+import { rateLimit } from './lib/rateLimit.js'
 import estimate from './routes/estimate.js'
 import record from './routes/record.js'
 import fx from './routes/fx.js'
@@ -17,6 +18,11 @@ export const app = new Hono().basePath('/api')
 
 app.use('*', requestLog())
 app.use('*', cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' }))
+
+// 요청 수 제한 (BE-7): Claude 를 부르는 API 는 접속 기기마다 분당 30회, 나머지는 분당 300회
+const aiLimit = rateLimit({ limit: Number(process.env.AI_RATE_LIMIT) || 30 })
+for (const path of ['/estimate', '/record', '/trips/:tripId/receipts/*']) app.use(path, aiLimit)
+app.use('*', rateLimit({ limit: Number(process.env.API_RATE_LIMIT) || 300 }))
 
 app.get('/health', (c) => c.json({ ok: true }))
 
