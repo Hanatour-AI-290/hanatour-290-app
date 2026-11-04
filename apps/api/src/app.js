@@ -11,6 +11,7 @@ import records from './routes/records.js'
 import receipts from './routes/receipts.js'
 import settle from './routes/settle.js'
 import budget from './routes/budget.js'
+import match from './routes/match.js'
 
 export const app = new Hono().basePath('/api')
 
@@ -27,6 +28,9 @@ app.route('/record', record)
 app.route('/fx', fx)
 app.route('/settle', settle)
 app.route('/', budget) // POST /budget, POST /report
+
+// 기록 ↔ 예정 항목 연결 후보 (ML 임베딩 모델, Claude 안 부름)
+app.route('/match', match)
 
 // 영수증 분석 (AI 담당 runPipeline 을 부른다)
 app.route('/trips/:tripId/receipts', receipts)

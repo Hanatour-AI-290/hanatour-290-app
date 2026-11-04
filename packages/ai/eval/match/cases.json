@@ -1,0 +1,36 @@
+{
+  "_note": "직접 만든 예시 (실제 사용자 데이터 아님). 예정 항목은 apps/web/src/sample.js 의 터키 투어 상품 분석 결과. answer = 연결돼야 하는 items 번호, null = 어느 예정 항목도 아님",
+  "items": [
+    { "idx": 0, "name": "가이드/기사 경비", "category": "가이드·기사 경비", "amount": 100000, "currency": "KRW" },
+    { "idx": 1, "name": "카파도키아 열기구 투어", "category": "선택관광", "amount": 320, "currency": "EUR" },
+    { "idx": 2, "name": "고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전)", "category": "선택관광", "amount": 180, "currency": "EUR" },
+    { "idx": 3, "name": "안탈리아 유람선 투어", "category": "선택관광", "amount": 60, "currency": "EUR" },
+    { "idx": 4, "name": "카트 투어", "category": "선택관광", "amount": 60, "currency": "EUR" },
+    { "idx": 5, "name": "지프 사파리", "category": "선택관광", "amount": null, "currency": null },
+    { "idx": 6, "name": "보스포루스 야경 투어", "category": "선택관광", "amount": null, "currency": null }
+  ],
+  "cases": [
+    { "id": "s01", "kind": "sms", "text": "[Web발신] 하나카드(1*2*) 해외승인 EUR 1,280.00 KAPADOKYA BALON TUR", "amount": 1280, "currency": "EUR", "people": 4, "answer": 1 },
+    { "id": "s02", "kind": "sms", "text": "[Web발신] 해외승인 EUR 320.00 GOREME BALLOONS", "amount": 320, "currency": "EUR", "people": 1, "answer": 1 },
+    { "id": "s03", "kind": "sms", "text": "[Web발신] 해외승인 EUR 540.00 AYASOFYA DOLMABAHCE TUR", "amount": 540, "currency": "EUR", "people": 3, "answer": 2 },
+    { "id": "s04", "kind": "sms", "text": "[Web발신] 해외승인 EUR 240.00 ANTALYA TEKNE TURU", "amount": 240, "currency": "EUR", "people": 4, "answer": 3 },
+    { "id": "s05", "kind": "sms", "text": "[Web발신] 해외승인 EUR 60.00 ANTALYA GO KART PARK", "amount": 60, "currency": "EUR", "people": 1, "answer": 4 },
+    { "id": "s06", "kind": "sms", "text": "[Web발신] 해외승인 EUR 60.00 KALEICI BOAT TRIP", "amount": 60, "currency": "EUR", "people": 1, "answer": 3 },
+    { "id": "s07", "kind": "sms", "text": "[Web발신] 해외승인 TRY 4,800.00 CAPPADOCIA JEEP SAFARI", "amount": 4800, "currency": "TRY", "people": 4, "answer": 5 },
+    { "id": "s08", "kind": "sms", "text": "[Web발신] 해외승인 TRY 2,600.00 BOGAZ GECE TURU", "amount": 2600, "currency": "TRY", "people": 2, "answer": 6 },
+    { "id": "s09", "kind": "sms", "text": "[Web발신] 해외승인 TRY 356.00 MIGROS ANTALYA", "amount": 356, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "s10", "kind": "sms", "text": "[Web발신] 해외승인 EUR 58.00 SULTANAHMET KEBAP SALONU", "amount": 58, "currency": "EUR", "people": 1, "answer": null },
+    { "id": "s11", "kind": "sms", "text": "[Web발신] 해외승인 TRY 900.00 GRAND BAZAAR HALI", "amount": 900, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "s12", "kind": "sms", "text": "[Web발신] 해외승인 EUR 320.00 ISTANBUL HAVALIMANI DUTY FREE", "amount": 320, "currency": "EUR", "people": 1, "answer": null },
+    { "id": "v01", "kind": "voice", "text": "열기구 1280유로 내가 냈어 넷이 나눠", "amount": 1280, "currency": "EUR", "people": 4, "answer": 1 },
+    { "id": "v02", "kind": "voice", "text": "성소피아랑 지하궁전 투어 180유로", "amount": 180, "currency": "EUR", "people": 1, "answer": 2 },
+    { "id": "v03", "kind": "voice", "text": "배 타는 투어 60유로 카드로", "amount": 60, "currency": "EUR", "people": 1, "answer": 3 },
+    { "id": "v04", "kind": "voice", "text": "고카트 탔어 60유로", "amount": 60, "currency": "EUR", "people": 1, "answer": 4 },
+    { "id": "v05", "kind": "voice", "text": "지프 투어 1200리라 현금", "amount": 1200, "currency": "TRY", "people": 1, "answer": 5 },
+    { "id": "v06", "kind": "voice", "text": "가이드 아저씨한테 경비 10만원 줬어", "amount": 100000, "currency": "KRW", "people": 1, "answer": 0 },
+    { "id": "v07", "kind": "voice", "text": "기념품 300리라 현금", "amount": 300, "currency": "TRY", "people": 1, "answer": null },
+    { "id": "v08", "kind": "voice", "text": "택시비 450리라 하린이랑 반반", "amount": 450, "currency": "TRY", "people": 2, "answer": null },
+    { "id": "v09", "kind": "voice", "text": "저녁 케밥 600리라 넷이서", "amount": 600, "currency": "TRY", "people": 4, "answer": null },
+    { "id": "v10", "kind": "voice", "text": "로쿰 과자 선물용 250리라", "amount": 250, "currency": "TRY", "people": 1, "answer": null }
+  ]
+}

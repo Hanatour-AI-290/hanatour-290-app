@@ -15,18 +15,18 @@ export const SAMPLE = `[튀르키예 일주 7박 9일] 상품가 1,240,000원 (1
 - 보스포루스 야경 투어`
 
 // 현장 인터넷이 끊겨도 시연이 멈추지 않도록, 위 예시 문구를 배포본으로 실제 분석한 결과(2026-11-02 호출)를 저장해 둔다.
-// 화면에는 "저장된 분석 결과"라고 표시한다.
+// 화면에는 "저장된 분석 결과"라고 표시한다. aliases(기록 ↔ 예정 항목 연결용 다른 이름)는 2026-11-04 같은 문구를 estimate() 로 분석한 결과 (packages/ai/eval/match/aliases.json)
 export const SAMPLE_RESULT = {
   title: '튀르키예 일주 7박 9일',
   base_price_krw: 1240000,
   items: [
-    { name: '가이드/기사 경비', category: '가이드·기사 경비', amount: 100000, currency: 'KRW', required: true, evidence: '가이드/기사 경비: 현지 지불, 약 10만 원' },
-    { name: '카파도키아 열기구 투어', category: '선택관광', amount: 320, currency: 'EUR', required: false, evidence: '카파도키아 열기구 투어: 320유로' },
-    { name: '고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전)', category: '선택관광', amount: 180, currency: 'EUR', required: false, evidence: '고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전): 180유로' },
-    { name: '안탈리아 유람선 투어', category: '선택관광', amount: 60, currency: 'EUR', required: false, evidence: '안탈리아 유람선 투어: 60유로' },
-    { name: '카트 투어', category: '선택관광', amount: 60, currency: 'EUR', required: false, evidence: '카트 투어: 60유로' },
-    { name: '지프 사파리', category: '선택관광', amount: null, currency: 'OTHER', required: false, evidence: '지프 사파리' },
-    { name: '보스포루스 야경 투어', category: '선택관광', amount: null, currency: 'OTHER', required: false, evidence: '보스포루스 야경 투어' },
+    { name: '가이드/기사 경비', category: '가이드·기사 경비', amount: 100000, currency: 'KRW', required: true, evidence: '가이드/기사 경비: 현지 지불, 약 10만 원', aliases: ['가이드 경비', '기사 경비', '가이드비', 'guide fee', 'driver fee', 'guide & driver tip'] },
+    { name: '카파도키아 열기구 투어', category: '선택관광', amount: 320, currency: 'EUR', required: false, evidence: '카파도키아 열기구 투어: 320유로', aliases: ['열기구', '카파도키아 열기구', 'hot air balloon', 'balloon ride', 'Cappadocia balloon', 'sıcak hava balonu'] },
+    { name: '고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전)', category: '선택관광', amount: 180, currency: 'EUR', required: false, evidence: '고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전): 180유로', aliases: ['고고학 시리즈', '성소피아', '돌마바흐체', '예레바탄 지하궁전', 'Hagia Sophia', 'Dolmabahçe', 'Basilica Cistern', 'Yerebatan Sarnıcı'] },
+    { name: '안탈리아 유람선 투어', category: '선택관광', amount: 60, currency: 'EUR', required: false, evidence: '안탈리아 유람선 투어: 60유로', aliases: ['안탈리아 유람선', '유람선', 'Antalya boat trip', 'Antalya cruise', 'tekne turu'] },
+    { name: '카트 투어', category: '선택관광', amount: 60, currency: 'EUR', required: false, evidence: '카트 투어: 60유로', aliases: ['카트', '고카트', 'go-kart', 'kart', 'karting'] },
+    { name: '지프 사파리', category: '선택관광', amount: null, currency: 'OTHER', required: false, evidence: '지프 사파리', aliases: ['지프', '지프 투어', 'jeep safari', 'jeep', 'cip safari'] },
+    { name: '보스포루스 야경 투어', category: '선택관광', amount: null, currency: 'OTHER', required: false, evidence: '보스포루스 야경 투어', aliases: ['보스포루스 야경', '보스포루스', 'Bosphorus night cruise', 'Bosphorus', 'Boğaz turu'] },
   ],
   fx: { date: '2026-10-30', krw: { EUR: 1491.758, JPY: 8.4911, USD: 1335.274 } },
 }

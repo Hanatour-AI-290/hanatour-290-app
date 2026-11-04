@@ -1,0 +1,60 @@
+{
+  "model": "claude-opus-5-5",
+  "date": "2026-11-04",
+  "byName": {
+    "가이드/기사 경비": [
+      "가이드 경비",
+      "기사 경비",
+      "가이드비",
+      "guide fee",
+      "driver fee",
+      "guide & driver tip"
+    ],
+    "카파도키아 열기구 투어": [
+      "열기구",
+      "카파도키아 열기구",
+      "hot air balloon",
+      "balloon ride",
+      "Cappadocia balloon",
+      "sıcak hava balonu"
+    ],
+    "고고학 시리즈 (성소피아, 돌마바흐체, 예레바탄 지하궁전)": [
+      "고고학 시리즈",
+      "성소피아",
+      "돌마바흐체",
+      "예레바탄 지하궁전",
+      "Hagia Sophia",
+      "Dolmabahçe",
+      "Basilica Cistern",
+      "Yerebatan Sarnıcı"
+    ],
+    "안탈리아 유람선 투어": [
+      "안탈리아 유람선",
+      "유람선",
+      "Antalya boat trip",
+      "Antalya cruise",
+      "tekne turu"
+    ],
+    "카트 투어": [
+      "카트",
+      "고카트",
+      "go-kart",
+      "kart",
+      "karting"
+    ],
+    "지프 사파리": [
+      "지프",
+      "지프 투어",
+      "jeep safari",
+      "jeep",
+      "cip safari"
+    ],
+    "보스포루스 야경 투어": [
+      "보스포루스 야경",
+      "보스포루스",
+      "Bosphorus night cruise",
+      "Bosphorus",
+      "Boğaz turu"
+    ]
+  }
+}

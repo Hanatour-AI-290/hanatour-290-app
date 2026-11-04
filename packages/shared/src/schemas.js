@@ -123,6 +123,7 @@ export const PlanItem = z.object({
   amount: z.number().nullable(),
   currency: z.string(), // 모르면 'OTHER'
   required: z.boolean(),
+  aliases: z.array(z.string()).optional(), // 기록 ↔ 예정 항목 연결용 다른 이름 (POST /match/plan)
 })
 
 /** 상품 분석(/estimate) 응답. fx.krw = 외화 1 단위가 몇 원인지 */

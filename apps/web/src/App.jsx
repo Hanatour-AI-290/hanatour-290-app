@@ -57,7 +57,7 @@ function buildRecords(data) {
     return [{
       id: `i${i}`, idx: i, src: '일정', day: slot?.day ?? 0, time: slot?.time ?? '',
       name: it.name, category: it.category, amount: it.amount, currency: it.currency === 'OTHER' ? null : it.currency,
-      perPerson: true, required: it.required,
+      perPerson: true, required: it.required, aliases: it.aliases ?? [],
       status: seed?.status ?? null,
       payer, people, method: 'card',
       // 지난 일정(SEED)은 이미 다 같이 확인한 상태로 시작한다 (R-11)
@@ -460,6 +460,40 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
         if (of) update(rec.id, { dup: { id: of.id, name: of.name } })
       })
       .catch(() => {})
+    if (rec.src !== '일정') suggestPlan(rec)
+  }
+
+  // 예정 항목 연결 (AI 활용 방향 추천 2): 카드 문자 "괴레메 열기구 투어" → 일정의 "카파도키아 열기구 투어" 였나요?
+  // 이름 비교는 서버의 ML 임베딩 모델, 금액 · 통화 규칙도 서버. 화면은 후보를 보여 주고 사용자가 고른다
+  function suggestPlan(rec) {
+    const open = records.filter((r) => r.src === '일정' && r.status !== 'done' && planned(r))
+    if (!open.length || !rec.name) return
+    postJson('/api/match/plan', {
+      record: { text: rec.name, amount: rec.amount ?? null, currency: rec.currency ?? null, people: Math.max(1, rec.people?.length ?? 1) },
+      items: open.map((r) => ({ idx: r.idx, name: r.name, aliases: (r.aliases ?? []).slice(0, 12), amount: r.amount ?? null, currency: r.currency ?? null })),
+    })
+      .then(({ candidates }) => {
+        const c = candidates[0]
+        const of = c ? open.find((r) => r.idx === c.idx) : null
+        if (of) update(rec.id, { plan: { id: of.id, name: of.name, amountMatch: c.amountMatch } })
+      })
+      .catch(() => {})
+  }
+
+  // [맞아요] 일정 항목을 실제 기록 내용으로 "했다" 처리하고 새 기록은 지운다 → 한 건만 남고 리포트 예상 vs 실제에 연결된다
+  function linkPlan(rec) {
+    const { id } = rec.plan
+    setRecords((rs) => rs.flatMap((r) => {
+      if (r.id === rec.id) return []
+      if (r.id !== id) return [r]
+      return [{
+        ...r, status: 'done', amount: rec.amount, currency: rec.currency, perPerson: false,
+        payer: rec.payer, payers: rec.payers, people: rec.people, method: rec.method,
+        confirm: rec.confirm, lines: rec.lines, splits: rec.splits, questions: rec.questions,
+        merchant: rec.merchant, evidence: rec.evidence, linkedFrom: rec.src,
+      }]
+    }))
+    toast(`“${rec.plan.name}” 일정에 기록했어요`)
   }
 
   function openManual(name = '') {
@@ -662,6 +696,15 @@ function Ledger({ data, picks, records, setRecords, day, setDay, toast, go, view
                     <div className="yn">
                       <button onClick={() => setRecords(records.filter((x) => x.id !== r.id))}>같은 결제 · 지우기</button>
                       <button onClick={() => update(r.id, { dup: null })}>다른 결제예요</button>
+                    </div>
+                  </div>
+                )}
+                {r.plan && !r.dup && (
+                  <div className="dup plan">
+                    “{r.plan.name}” 예정 지출인가요? 이름이 비슷해요{r.plan.amountMatch ? ' · 금액도 같아요' : ''}
+                    <div className="yn">
+                      <button onClick={() => linkPlan(r)}>맞아요 · 일정에 기록</button>
+                      <button onClick={() => update(r.id, { plan: null })}>아니에요</button>
                     </div>
                   </div>
                 )}
