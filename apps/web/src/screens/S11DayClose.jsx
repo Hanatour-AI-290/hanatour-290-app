@@ -12,7 +12,9 @@ const STARS = [[40, 90, 4, 0], [300, 70, 3, 1.6], [330, 160, 4, 0.8], [180, 60, 
 export default function DayClose({ state, go, next, toast }) {
   const daily = state.daily ?? TRIP5.dailyLira
   // 오늘 쓴 돈 = 저녁 내 몫 510 + 혼자 쓴 기념품 300 = 810 (10번 가계부와 같은 값)
-  const spent = DINNER.shares.지우 + (state.solo?.amount ?? 300)
+  // 리라로 쓴 돈만 하루 생활비(리라)와 비교한다
+  const soloLira = !state.solo ? 300 : (state.solo.currency ?? 'TRY') === 'TRY' ? state.solo.amount : 0
+  const spent = DINNER.shares.지우 + soloLira
   const diff = daily - spent
   const left = MY_WALLET.TRY
   const need = DAYS_LEFT * daily
@@ -67,7 +69,7 @@ export default function DayClose({ state, go, next, toast }) {
           </div>
 
           <div className="close-btns">
-            <button type="button" className="cta line close-cut" onClick={() => go(3)}>생활비 줄이기</button>
+            <button type="button" className="cta line close-cut" onClick={() => go('3')}>생활비 줄이기</button>
             <button type="button" className="cta" onClick={topUp}>리라 충전하기</button>
           </div>
         </article>

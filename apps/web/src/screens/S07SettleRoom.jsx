@@ -72,10 +72,10 @@ export default function SettleRoom({ next, prev, go, state }) {
       </div>
 
       <footer className="room-compose">
-        <button type="button" className="room-cam" onClick={() => go(4)} aria-label="영수증 찍기">
+        <button type="button" className="room-cam" onClick={() => go('4')} aria-label="영수증 찍기">
           <img src={IMG('s07-camera.svg')} width="22" height="22" alt="" />
         </button>
-        <button type="button" className="room-talk" onClick={() => go(9)}>
+        <button type="button" className="room-talk" onClick={() => go('9')}>
           <img src={IMG('s07-mic.svg')} width="20" height="20" alt="" />
           꾹 누르고 말하기
         </button>

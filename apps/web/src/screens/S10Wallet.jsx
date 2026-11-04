@@ -2,15 +2,18 @@ import { IMG, MY_WALLET, PEOPLE, TRIP5 } from '../demo.js'
 import { Avatar, CountUp, TabBar, lira } from '../ui.jsx'
 import './S10Wallet.css'
 
+const UNIT = { TRY: '리라', EUR: '유로', KRW: '원', USD: '달러', JPY: '엔' }
+
 // 10 내 지갑과 오늘 가계부 (지우의 폰). 오늘 쓴 돈 = 저녁 내 몫 + 혼자 쓴 기념품
 export default function Wallet({ state, tab, go, toast }) {
   const daily = state.daily ?? TRIP5.dailyLira
   const solo = state.solo ?? { name: '기념품', amount: 300, method: '현금', category: '쇼핑', krw: '약 1만 원' }
   const rows = [
-    { img: IMG('dinner.png'), name: '마가라 레스토랑 저녁', sub: '같이 씀, 내 몫', amount: -510, krw: '약 1.7만 원' },
-    { img: IMG('souvenir.png'), name: solo.name, sub: `${solo.method}, ${solo.category}`, amount: -solo.amount, krw: solo.krw },
+    { img: IMG('dinner.png'), name: '마가라 레스토랑 저녁', sub: '같이 씀, 내 몫', amount: -510, currency: 'TRY', krw: '약 1.7만 원' },
+    { img: IMG('souvenir.png'), name: solo.name, sub: `${solo.method}, ${solo.category}`, amount: -solo.amount, currency: solo.currency ?? 'TRY', krw: solo.krw },
   ]
-  const spent = rows.reduce((a, r) => a - r.amount, 0)
+  // 하루 생활비는 리라 기준이라 리라로 쓴 돈만 더한다
+  const spent = rows.filter((r) => r.currency === 'TRY').reduce((a, r) => a - r.amount, 0)
   const left = daily - spent
 
   return (
@@ -26,7 +29,7 @@ export default function Wallet({ state, tab, go, toast }) {
             <p className="w-cur">튀르키예 리라</p>
             <p className="w-amt"><CountUp to={MY_WALLET.TRY} /><small>리라</small></p>
             <div className="w-row">
-              <button type="button" className="w-charge" onClick={() => go(11)}><img src={IMG('icon-plus.svg')} width="14" height="14" alt="" />충전</button>
+              <button type="button" className="w-charge" onClick={() => go('11')}><img src={IMG('icon-plus.svg')} width="14" height="14" alt="" />충전</button>
               <span className="w-recv">받을 돈 {lira(MY_WALLET.receivable)}</span>
             </div>
           </article>
@@ -50,7 +53,7 @@ export default function Wallet({ state, tab, go, toast }) {
               <li key={r.name}>
                 <img className="w-thumb" src={r.img} width="44" height="44" alt="" />
                 <div className="w-txt"><p>{r.name}</p><small>{r.sub}</small></div>
-                <div className="w-val"><p className="num">{lira(r.amount)}리라</p><small>{r.krw}</small></div>
+                <div className="w-val"><p className="num">{lira(r.amount)}{UNIT[r.currency] ?? ` ${r.currency}`}</p><small>{r.krw}</small></div>
               </li>
             ))}
             <li>

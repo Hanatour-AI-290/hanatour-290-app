@@ -50,3 +50,9 @@
 .spl-shares .num { font-size: 14px; }
 .spl-foot .cta { flex: none; width: 100%; }
 .spl .scr-foot { padding-top: 4px; }
+
+/* 서버 검사에서 합계가 안 맞을 때 (FR-009): 주황 (11번 화면과 같은 색) */
+.spl-bad { color: #e8590c; }
+.spl-ok.spl-bad i { background: #fff1e8; }
+.spl-chips button { transition: background 0.2s, color 0.2s; }
+.spl-more { margin-top: -6px; font-size: 12px; color: #8a6a1f; }
