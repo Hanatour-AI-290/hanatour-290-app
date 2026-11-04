@@ -87,35 +87,3 @@ export const WALLETS = [
   { memberId: 'm3', balances: [{ amount: 30000, currency: 'TRY', method: 'card' }, { amount: 300000, currency: 'TRY', method: 'cash' }, { amount: 80000, currency: 'EUR', method: 'card' }] },
   { memberId: 'm4', balances: [{ amount: 500000, currency: 'TRY', method: 'card' }, { amount: 100000, currency: 'TRY', method: 'cash' }, { amount: 40000, currency: 'EUR', method: 'card' }] },
 ]
-
-// 예시 영수증(public/img/receipt-sample.jpg, packages/ai/eval/cases/001)에 덧붙이는 말
-export const SAMPLE_RECEIPT_UTTERANCE = '차는 하린이랑 도윤만, 나머지는 다 같이'
-
-/**
- * 예시 영수증 분석이 실패했을 때(인터넷 끊김, AI 한도 등) 이어 갈 저장된 결과. /receipts/analyze 응답과 같은 모양.
- * AI 호출 결과가 아니라 영수증에 찍힌 값을 그대로 옮긴 것 (정답 001.json 과 같음). 화면에는 "저장된 분석 결과"로 표시한다.
- * 말이 예시 문구와 다르면 줄별 배정은 비워 두고(전원 1/N) 확인해 달라고 묻는다.
- * @param {string} utterance 사용자가 덧붙인 말
- */
-export function sampleReceiptResult(utterance) {
-  const same = utterance.trim() === SAMPLE_RECEIPT_UTTERANCE
-  return {
-    receipt: {
-      merchant: 'MAĞARA RESTORAN',
-      paidAt: '2026-11-05T19:42',
-      category: '식사',
-      currency: 'TRY',
-      total: 356000,
-      lines: [
-        { name: 'TESTİ KEBABI', nameKo: '항아리 케밥', kind: 'item', qty: 4, unitPrice: 65000, total: 260000, source: '4 x TESTİ KEBABI 2.600,00' },
-        { name: 'MEZE TABAĞI', nameKo: '메제 모둠', kind: 'item', qty: 2, unitPrice: 28000, total: 56000, source: '2 x MEZE TABAĞI 560,00' },
-        { name: 'AYRAN', nameKo: '아이란(요거트 음료)', kind: 'item', qty: 4, unitPrice: 6000, total: 24000, source: '4 x AYRAN 240,00' },
-        { name: 'ÇAY', nameKo: '차', kind: 'item', qty: 4, unitPrice: 4000, total: 16000, source: '4 x ÇAY 160,00' },
-      ],
-    },
-    payerId: null, // 올린 사람이 낸 것으로 본다
-    splits: same ? [{ lineIndex: 3, memberIds: ['m2', 'm3'], source: '차는 하린이랑 도윤만' }] : [],
-    questions: same || !utterance.trim() ? [] : [{ field: 'memberIds', text: '저장된 결과라 덧붙인 말은 반영되지 않았어요. 줄마다 누가 낼지 확인해 주세요' }],
-    saved: true,
-  }
-}
