@@ -1,17 +1,19 @@
 // 환율. 실패하면 null → 화면은 외화 그대로 보여 준다.
 
-// 상품 분석(estimate)용 최신 환율 4개 통화 (프로토타입 api/_shared.js rates() 에서 옮김)
+// 상품 분석(estimate)용 최신 환율 4개 통화. 결제일 환율과 같은 출처 순서(Frankfurter → ExchangeRate-API)를 쓴다.
+// 전에는 api.frankfurter.app 을 시간 제한 없이 불러서, 그 주소가 응답하지 않으면(2026-11-04) 외화 항목이 모두 합계에서 빠졌다
+const RATE_CURRENCIES = ['USD', 'EUR', 'JPY', 'TRY']
 export async function rates() {
-  try {
-    const r = await fetch('https://api.frankfurter.app/latest?from=KRW&to=USD,EUR,JPY,TRY')
-    if (!r.ok) return null
-    const j = await r.json()
-    const krw = {}
-    for (const [cur, v] of Object.entries(j.rates)) krw[cur] = 1 / v
-    return { date: j.date, krw }
-  } catch {
-    return null
-  }
+  const got = await Promise.all(RATE_CURRENCIES.map((c) => rateOn(c)))
+  const krw = {}
+  let first = null
+  got.forEach((r, i) => {
+    if (!r) return
+    krw[RATE_CURRENCIES[i]] = r.rate
+    first ??= r
+  })
+  if (!first) return null
+  return { date: first.date, krw, source: first.source }
 }
 
 // ---------------------------------------------------------------- 결제일 환율 (R-20)

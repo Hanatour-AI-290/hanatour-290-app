@@ -1,6 +1,6 @@
 import { test, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { rateOn } from '../src/lib/fx.js'
+import { rateOn, rates } from '../src/lib/fx.js'
 
 // 실제 환율 서버를 부르지 않도록 fetch 를 바꿔 끼운다
 const realFetch = globalThis.fetch
@@ -37,4 +37,14 @@ test('예비로 채운 값은 저장하지 않아서, 복구되면 결제일 환
 test('모든 출처가 실패하면 null (화면은 외화 그대로)', async () => {
   globalThis.fetch = async () => { throw new Error('offline') }
   assert.equal(await rateOn('USD', '2026-10-03'), null)
+})
+
+test('상품 분석용 최신 환율(rates)도 Frankfurter 가 죽으면 예비로 4개 통화를 채운다', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).includes('frankfurter')) throw new Error('down')
+    const cur = String(url).split('/').pop()
+    return json({ result: 'success', rates: { KRW: { USD: 1340, EUR: 1500, JPY: 8.5, TRY: 27 }[cur] }, time_last_update_unix: Date.UTC(2026, 10, 4) / 1000 })
+  }
+  const fx = await rates()
+  assert.deepEqual(fx, { date: '2026-11-04', krw: { USD: 1340, EUR: 1500, JPY: 8.5, TRY: 27 }, source: 'ExchangeRate-API' })
 })
