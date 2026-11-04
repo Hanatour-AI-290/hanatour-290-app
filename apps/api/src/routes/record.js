@@ -1,10 +1,12 @@
 // POST /api/record  { text?, image?(data URL), kind?, members[], me } → 지출 항목 하나   (R-15·16·18)
 import { Hono } from 'hono'
+import { upstream } from '../lib/upstream.js'
 import { readRecord } from '@h290/ai'
 
 const r = new Hono()
 
-r.post('/', async (c) => {
+// 로컬에 키가 없으면 배포본으로 넘김 (lib/upstream.js)
+r.post('/', upstream('/record'), async (c) => {
   const body = await c.req.json().catch(() => ({}))
   const text = String(body?.text ?? '').trim()
   const imageUrl = String(body?.image ?? '')
