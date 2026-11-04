@@ -21,7 +21,7 @@ app.use('*', cors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173' }
 
 // 요청 수 제한 (BE-7): Claude 를 부르는 API 는 접속 기기마다 분당 30회, 나머지는 분당 300회
 const aiLimit = rateLimit({ limit: Number(process.env.AI_RATE_LIMIT) || 30 })
-for (const path of ['/estimate', '/record', '/trips/:tripId/receipts/*']) app.use(path, aiLimit)
+for (const path of ['/estimate', '/record', '/match/plan', '/trips/:tripId/receipts/*']) app.use(path, aiLimit)
 app.use('*', rateLimit({ limit: Number(process.env.API_RATE_LIMIT) || 300 }))
 
 app.get('/health', (c) => c.json({ ok: true }))
@@ -35,7 +35,7 @@ app.route('/fx', fx)
 app.route('/settle', settle)
 app.route('/', budget) // POST /budget, POST /report
 
-// 기록 ↔ 예정 항목 연결 후보 (ML 임베딩 모델, Claude 안 부름)
+// 기록 ↔ 예정 항목 연결 후보 (ML 임베딩 모델 + 규칙, 애매할 때만 Claude 재순위)
 app.route('/match', match)
 
 // 영수증 분석 (AI 담당 runPipeline 을 부른다)

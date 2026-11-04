@@ -34,10 +34,37 @@ async function extractor(model) {
  */
 export async function embed(texts, kind, { model = EMBED_MODEL } = {}) {
   if (!texts.length) return []
-  const fe = await extractor(model)
-  const input = needsPrefix(model) ? texts.map((t) => PREFIX[kind] + t) : texts
-  const out = await fe(input, { pooling: 'mean', normalize: true })
-  return out.tolist()
+  // 한 여행의 예정 항목 · 별칭은 기록마다 같으므로, 이미 계산한 문장은 다시 돌리지 않는다
+  const key = (t) => `${model}\n${kind}\n${t}`
+  const todo = [...new Set(texts.filter((t) => !cache.has(key(t))))]
+  if (todo.length) {
+    const fe = await extractor(model)
+    // 한 문장씩 돌린다. 여러 문장을 한 번에 넣으면 길이 맞춤(padding) 때문에 8비트 모델 값이 최대 0.003 달라져서,
+    // 같은 문장이라도 함께 넣은 문장(= 저장된 것이 무엇이냐)에 따라 결과가 바뀐다 (문턱값이 0.01 단위라 결과가 뒤집힌다)
+    for (const t of todo) {
+      const out = await fe([needsPrefix(model) ? PREFIX[kind] + t : t], { pooling: 'mean', normalize: true })
+      remember(key(t), out.tolist()[0])
+    }
+  }
+  return texts.map((t) => {
+    const v = cache.get(key(t))
+    remember(key(t), v) // 최근에 쓴 것으로 옮긴다
+    return v
+  })
+}
+
+/** 문장 → 벡터. 오래 안 쓴 것부터 버린다 (384차원 × 3000개 ≈ 10MB) */
+const CACHE_MAX = 3000
+const cache = new Map()
+function remember(k, v) {
+  cache.delete(k)
+  cache.set(k, v)
+  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value)
+}
+
+/** 모델을 미리 불러 둔다 (첫 기록이 느리지 않게). GET /api/match/warm */
+export async function warmup({ model = EMBED_MODEL } = {}) {
+  await extractor(model)
 }
 
 /** 정규화된 두 벡터의 코사인 유사도 */
