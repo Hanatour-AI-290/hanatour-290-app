@@ -9,7 +9,7 @@ const DAYS_LEFT = 5
 // 디자인 속 작은 별 (x, y, 크기, 반짝임 지연)
 const STARS = [[40, 90, 4, 0], [300, 70, 3, 1.6], [330, 160, 4, 0.8], [180, 60, 3, 2.4]]
 
-export default function DayClose({ state, go, next, toast }) {
+export default function DayClose({ state, go, toast }) {
   const daily = state.daily ?? TRIP5.dailyLira
   // 오늘 쓴 돈 = 저녁 내 몫 510 + 혼자 쓴 기념품 300 = 810 (10번 가계부와 같은 값)
   // 리라로 쓴 돈만 하루 생활비(리라)와 비교한다
@@ -22,7 +22,7 @@ export default function DayClose({ state, go, next, toast }) {
 
   const topUp = () => {
     toast(short > 0 ? `${lira(short)}리라 충전했어요` : '지금은 충전하지 않아도 돼요')
-    next()
+    go('10') // Figma 프로토타입: 충전하면 가계부로
   }
 
   return (
@@ -69,7 +69,7 @@ export default function DayClose({ state, go, next, toast }) {
           </div>
 
           <div className="close-btns">
-            <button type="button" className="cta line close-cut" onClick={() => go('3')}>생활비 줄이기</button>
+            <button type="button" className="cta line close-cut" onClick={() => go('home')}>생활비 줄이기</button>
             <button type="button" className="cta" onClick={topUp}>리라 충전하기</button>
           </div>
         </article>

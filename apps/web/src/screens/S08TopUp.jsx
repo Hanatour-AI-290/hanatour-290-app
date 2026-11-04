@@ -30,7 +30,7 @@ async function tryApply(n) {
 }
 
 // 8 서준의 폰: 모자라면 충전
-export default function TopUp({ next, set, toast }) {
+export default function TopUp({ go, set, toast }) {
   const share = DINNER.shares[ME] // 510
   const short = share - BALANCE // 110
   const [n, setN] = useState(500)
@@ -44,7 +44,7 @@ export default function TopUp({ next, set, toast }) {
     if (got != null && got !== left) console.info('[8번] 서버 계산 남는 돈', got, '화면', left)
     set({ topup: n })
     toast(`${lira(n)}리라 충전, 지우에게 ${lira(share)}리라 보냈어요`)
-    next()
+    go('7') // Figma 프로토타입: 충전하면 정산방으로 돌아간다
   }
 
   return (

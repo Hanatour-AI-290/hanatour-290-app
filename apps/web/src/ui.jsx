@@ -27,14 +27,20 @@ export function Avatar({ src, size = 34, alt = '' }) {
   return <img className="av" src={src} width={size} height={size} alt={alt} />
 }
 
-const TABS = [['trip', '여행', 'icon-home.svg'], ['room', '정산방', 'icon-chat.svg'], ['ledger', '가계부', 'icon-wallet.svg'], ['my', 'MY', 'icon-user.svg']]
+// [id, 이름, 꺼진 아이콘, 켜진 아이콘] — Figma 탭 아이콘은 색이 고정된 SVG 라 켜짐·꺼짐을 따로 둔다
+const TABS = [
+  ['trip', '여행', 'icon-home.svg', 'icon-home-on.svg'],
+  ['room', '정산방', 'icon-chat.svg', 'icon-chat.svg'],
+  ['ledger', '가계부', 'icon-wallet-off.svg', 'icon-wallet.svg'],
+  ['my', 'MY', 'icon-user.svg', 'icon-user.svg'],
+]
 
 export function TabBar({ tab, go }) {
   return (
     <nav className="tabbar">
-      {TABS.map(([id, label, icon]) => (
+      {TABS.map(([id, label, off, on]) => (
         <button key={id} type="button" className={tab === id ? 'on' : ''} onClick={() => go(id)} aria-current={tab === id ? 'page' : undefined}>
-          <img src={IMG(icon)} width="22" height="22" alt="" />
+          <img src={IMG(tab === id ? on : off)} width="22" height="22" alt="" />
           {label}
         </button>
       ))}

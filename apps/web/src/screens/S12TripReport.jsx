@@ -29,14 +29,14 @@ function Row({ p, main }) {
   )
 }
 
-export default function TripReport({ toast, restart }) {
+export default function TripReport({ toast, go }) {
   const timer = useRef()
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const leave = () => {
     toast('다음 여행자에게 남겼어요')
     clearTimeout(timer.current)
-    timer.current = setTimeout(restart, 1000)
+    timer.current = setTimeout(() => go('home'), 1000)
   }
 
   const parts = [PACKAGE, ...LOCAL]

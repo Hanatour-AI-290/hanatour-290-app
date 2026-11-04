@@ -8,7 +8,7 @@ const ALL = ['지우', '하린', '도윤', '서준']
 const PAID = { 하린: true, 도윤: true, 서준: false }
 
 // 7 정산방: 알아서 나눠졌어요 (지우의 폰)
-export default function SettleRoom({ next, prev, go, state }) {
+export default function SettleRoom({ next, go, state }) {
   const d = dinnerOf(state)
   const shares = DINNER.shares // 시연 몫 (5번과 같은 510/690/690/510)
   const others = ALL.filter((n) => n !== d.payer)
@@ -17,7 +17,7 @@ export default function SettleRoom({ next, prev, go, state }) {
   return (
     <section className="scr room fade">
       <header className="room-head">
-        <button type="button" className="icon-btn room-back" onClick={prev} aria-label="뒤로">
+        <button type="button" className="icon-btn room-back" onClick={() => go('home')} aria-label="홈으로">
           <img src={IMG('s07-back.svg')} width="24" height="24" alt="" />
         </button>
         <div className="room-title">

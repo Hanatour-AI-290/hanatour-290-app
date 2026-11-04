@@ -40,3 +40,4 @@
 .w-val p { font-size: 15px; }
 .w-val .plus { color: var(--brand); }
 .w-note { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.w-today { cursor: pointer; }

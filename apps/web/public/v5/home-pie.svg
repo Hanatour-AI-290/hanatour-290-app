@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon pie" clip-path="url(#clip0_0_25)">
+<path id="Vector" d="M15.0238 11.2554C14.5731 12.3211 13.8683 13.2602 12.9709 13.9905C12.0735 14.7209 11.0109 15.2203 9.87589 15.4451C8.74091 15.6698 7.56813 15.6132 6.4601 15.28C5.35207 14.9469 4.34253 14.3473 3.51972 13.5339C2.69692 12.7204 2.08591 11.7178 1.74012 10.6136C1.39432 9.50948 1.32427 8.33743 1.53609 7.19995C1.74791 6.06247 2.23514 4.99419 2.9552 4.08852C3.67526 3.18285 4.60621 2.46735 5.66667 2.00458" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#5E2BB8"/>
+<path id="Vector_2" d="M15.5833 8.5C15.5833 7.5698 15.4001 6.64872 15.0441 5.78933C14.6882 4.92994 14.1664 4.14908 13.5087 3.49133C12.8509 2.83358 12.0701 2.31182 11.2107 1.95585C10.3513 1.59988 9.4302 1.41667 8.5 1.41667V8.5H15.5833Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="#5E2BB8"/>
+</g>
+<defs>
+<clipPath id="clip0_0_25">
+<rect width="17" height="17" fill="white"/>
+</clipPath>
+</defs>
+</svg>

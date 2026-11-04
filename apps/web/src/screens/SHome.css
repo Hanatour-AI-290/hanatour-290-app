@@ -1,0 +1,47 @@
+/* 홈 · 여행 중 첫 화면 (Figma 89:74) */
+.home .scr-body { padding: var(--top) 20px 20px; }
+.home-head { display: flex; align-items: center; justify-content: space-between; }
+.home-head > div { display: flex; flex-direction: column; gap: 2px; line-height: 1.4; }
+.home-trip { font-size: 13px; letter-spacing: -0.02em; color: var(--sub); }
+.home-head h1 { font-size: 26px; font-weight: 400; letter-spacing: -0.02em; }
+
+/* 오늘 쓸 수 있는 돈 */
+.home-today { cursor: pointer; margin-top: 18px; width: 100%; display: flex; flex-direction: column; padding: 18px 20px 20px; border-radius: 24px; color: #fff; background: linear-gradient(152.64deg, #6a35cc 0%, #3a1c82 71.43%); box-shadow: 0 10px 24px -6px rgba(94, 43, 184, 0.25); }
+.home-today-top { display: flex; justify-content: space-between; align-items: flex-start; line-height: 1.4; }
+.home-today-top span { font-size: 13px; letter-spacing: -0.02em; color: rgba(255, 255, 255, 0.8); }
+.home-today-top small { font-size: 12px; letter-spacing: -0.02em; color: rgba(255, 255, 255, 0.7); }
+.home-left { margin-top: 6px; display: flex; align-items: baseline; gap: 6px; }
+.home-left .num { font-size: 38px; line-height: 1.2; }
+.home-left > span:last-child { font-size: 16px; line-height: 1.4; letter-spacing: -0.02em; }
+.home-bar { display: block; margin-top: 14px; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
+.home-bar i { display: block; height: 100%; border-radius: 4px; background: #f4b740; }
+
+/* 카드 공통 */
+.home-rest { margin-top: 14px; display: flex; flex-direction: column; }
+.home-act, .home-room, .home-list { background: #fff; border: 1px solid var(--line); border-radius: 20px; }
+.home-txt { display: flex; flex-direction: column; gap: 1px; line-height: 1.4; text-align: left; white-space: nowrap; min-width: 0; }
+.home-txt b { font-weight: 400; font-size: 16px; letter-spacing: -0.02em; color: var(--ink); }
+.home-txt small { font-size: 12px; letter-spacing: -0.02em; color: var(--sub); }
+.home-txt.grow { flex: 1; }
+.home-ico { flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 20px; }
+.home-ico.brand { background: var(--brand); }
+.home-ico.soft { background: var(--lavender); }
+.home-ico.small { width: 34px; height: 34px; border-radius: 17px; background: var(--tint); }
+
+.home-actions { display: flex; gap: 10px; }
+.home-act { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 14px 10px 14px 14px; }
+
+.home-room { margin-top: 14px; display: flex; align-items: center; gap: 12px; padding: 14px 16px 14px 14px; }
+.home-room .home-txt { gap: 2px; }
+.home-room .home-txt b { font-size: 15px; }
+.home-stack { flex: none; display: flex; }
+.home-stack img { width: 30px; height: 30px; margin: -2px; margin-right: -9px; }
+.home-stack img:last-child { margin-right: -2px; }
+.home-badge { flex: none; padding: 2px 7px; border-radius: 10px; background: #e8590c; color: #fff; font-family: var(--font-num); font-weight: 700; font-size: 11px; letter-spacing: -0.02em; line-height: normal; }
+
+.home-sec { margin-top: 18px; font-size: 17px; font-weight: 400; line-height: 1.4; letter-spacing: -0.02em; }
+
+.home-list { margin-top: 10px; list-style: none; padding: 4px 16px; }
+.home-list li + li { border-top: 1px solid var(--line); }
+.home-list button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+.home-list .home-txt b { font-size: 15px; }
