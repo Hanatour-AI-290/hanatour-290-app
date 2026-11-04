@@ -1,7 +1,6 @@
 // R-15·16·18 영수증 사진 · 카드 결제 문자 · 말 한 줄 → 지출 항목 하나 (프로토타입 api/record.js 에서 옮김)
 import { z } from 'zod'
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
-import { getClient, MODEL } from './client.js'
+import { parse } from './client.js'
 import { resolvePayers } from './payers.js'
 
 export const RecordResult = z.object({
@@ -43,10 +42,10 @@ export async function readRecord({ text = '', image, kind, members, me }) {
     content.push({ type: 'text', text: `<${tag}>${text}</${tag}>` })
   }
 
-  const resp = await getClient().messages.parse({
-    model: MODEL,
+  const resp = await parse({
     max_tokens: 4000,
-    output_config: { effort: 'low', format: zodOutputFormat(RecordResult) },
+    schema: RecordResult,
+    output_config: { effort: 'low' },
     system: SYSTEM(members, me),
     messages: [{ role: 'user', content }],
   })

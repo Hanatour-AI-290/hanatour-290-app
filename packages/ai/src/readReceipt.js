@@ -1,8 +1,7 @@
 // 1단계 "찍고": 영수증 사진 → 줄 단위 항목 (R-07). 금액은 AI 가 읽은 소수 그대로 받고, 최소 단위 정수 변환은 코드가 한다.
 import { z } from 'zod'
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { Category, minorDigits } from '@h290/shared'
-import { getClient, MODEL } from './client.js'
+import { parse } from './client.js'
 
 const Line = z.object({
   name: z.string().describe('영수증에 찍힌 메뉴 이름 그대로 (예: TESTİ KEBABI)'),
@@ -40,10 +39,10 @@ export async function readReceipt({ image, mediaType, hint = [] }) {
   const text = hint.length
     ? `지난번에 읽은 결과가 틀렸다. 다시 읽어 줘.\n틀린 점:\n${hint.map((h) => `- ${h}`).join('\n')}`
     : '이 영수증을 줄 단위로 읽어 줘.'
-  const resp = await getClient().messages.parse({
-    model: MODEL,
+  const resp = await parse({
     max_tokens: 8000,
-    output_config: { effort: 'low', format: zodOutputFormat(ReceiptRead) },
+    schema: ReceiptRead,
+    output_config: { effort: 'low' },
     system: SYSTEM,
     messages: [{ role: 'user', content: [
       { type: 'image', source: { type: 'base64', media_type: mediaType, data: image } },

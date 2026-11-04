@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { amountMatches, cleanText, matchPlanItems, stripGeneric, MATCH_DEFAULTS } from '../src/index.js'
+import { amountMatches, cleanText, matchPlanItems, stripGeneric, lexicalHits, rerankOptions, MATCH_DEFAULTS, RELATIVE } from '../src/index.js'
 
 const items = [
   { idx: 1, amount: 320, currency: 'EUR' }, // 열기구
@@ -60,4 +60,41 @@ test('matchPlanItems: 금액이 같아도 이름이 충분히 비슷하지 않�
   // 편의점 1,800엔 ↔ 운하 크루즈 1,800엔 처럼 금액만 같은 경우
   const out = matchPlanItems({ record: { amount: 60, currency: 'EUR' }, items, sims: [0.7, 0.85, 0.8, 0.8] })
   assert.deepEqual(out, [])
+})
+
+// 상대 점수 (예정 항목 5개 이상 + 글자 겹침)
+const five = [
+  { idx: 0, name: '카파도키아 열기구 투어', aliases: ['hot air balloon'], amount: 250, currency: 'EUR' },
+  { idx: 1, name: '지프 사파리', amount: 60, currency: 'EUR' },
+  { idx: 2, name: '벨리댄스 쇼', amount: 70, currency: 'EUR' },
+  { idx: 3, name: '보스포루스 유람선', amount: 60, currency: 'EUR' },
+  { idx: 4, name: '파묵칼레 온천', amount: 80, currency: 'EUR' },
+]
+
+test('lexicalHits: 흔한 말을 뺀 이름이 항목 이름 · 별칭 안에 그대로 있으면 1', () => {
+  assert.deepEqual(lexicalHits('열기구 투어', five), [1, 0, 0, 0, 0])
+  assert.deepEqual(lexicalHits('Hot Air Balloon', five), [1, 0, 0, 0, 0])
+  assert.deepEqual(lexicalHits('투어', five), [0, 0, 0, 0, 0]) // 흔한 말만이면 아무것도 아니다 (글자 2자 미만)
+})
+
+test('matchPlanItems 상대 점수: 유사도가 0.86 아래여도 다른 항목보다 확실히 높으면 후보 (운영에서 놓치던 열기구)', () => {
+  const sims = [0.857, 0.766, 0.776, 0.77, 0.77]
+  assert.deepEqual(matchPlanItems({ record: {}, items: five, sims }), []) // 절대 점수로는 놓친다
+  const [c] = matchPlanItems({ record: {}, items: five, sims, lex: lexicalHits('열기구 투어', five) })
+  assert.equal(c.idx, 0)
+})
+
+test('matchPlanItems 상대 점수: 모두 비슷하면 후보 없음, 항목이 적으면 절대 점수', () => {
+  assert.deepEqual(matchPlanItems({ record: {}, items: five, sims: [0.8, 0.8, 0.79, 0.8, 0.8], lex: [0, 0, 0, 0, 0] }), [])
+  const few = five.slice(0, RELATIVE.minItems - 1)
+  const [c] = matchPlanItems({ record: {}, items: few, sims: [0.95, 0.8, 0.8, 0.8], lex: [1, 0, 0, 0] })
+  assert.equal(c.score, 0.95) // 절대 점수 그대로 (평균을 빼지 않음)
+})
+
+test('rerankOptions: 규칙이 정했거나 비슷한 게 없으면 부르지 않고, 애매하면 평균 이상인 것 최대 3개', () => {
+  const lex = [0, 0, 0, 0, 0]
+  assert.deepEqual(rerankOptions({ record: {}, items: five, sims: [0.95, 0.77, 0.77, 0.77, 0.77], lex }), []) // 규칙이 정함
+  assert.deepEqual(rerankOptions({ record: {}, items: five, sims: [0.83, 0.83, 0.75, 0.76, 0.75], lex }), [0, 1]) // 1·2등 동점
+  assert.deepEqual(rerankOptions({ record: {}, items: five.slice(0, 3), sims: [0.83, 0.83, 0.75] }), [0, 1]) // 항목이 적어도 애매하면 부른다
+  assert.deepEqual(rerankOptions({ record: {}, items: five.slice(0, 1), sims: [0.76] }), []) // 유사도가 낮으면 부르지 않는다
 })

@@ -1,7 +1,6 @@
 // R-01 상품 문구 → 가격표에 없는 비용 항목 추출 (프로토타입 api/estimate.js 에서 옮김)
 import { z } from 'zod'
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
-import { getClient, MODEL } from './client.js'
+import { parse } from './client.js'
 
 const Item = z.object({
   name: z.string().describe('항목 이름 (예: 카파도키아 열기구)'),
@@ -32,10 +31,10 @@ const SYSTEM = `너는 패키지 여행 상품 문구에서 "가격표에 없는
  * @returns {Promise<{ ok: true, data: z.infer<typeof EstimateResult> } | { ok: false, reason: 'refusal' | 'unparsed' }>}
  */
 export async function estimate(text) {
-  const resp = await getClient().messages.parse({
-    model: MODEL,
+  const resp = await parse({
     max_tokens: 16000,
-    output_config: { effort: 'low', format: zodOutputFormat(EstimateResult) },
+    schema: EstimateResult,
+    output_config: { effort: 'low' },
     system: SYSTEM,
     messages: [{ role: 'user', content: `<상품문구>\n${text}\n</상품문구>` }],
   })
