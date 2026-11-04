@@ -1,0 +1,23 @@
+{
+  "image": "001.jpg",
+  "note": "시연용 예시 영수증 (apps/web/public/img/receipt-sample.jpg, ÖRNEK 표시, 실제 가게·개인정보 없음)",
+  "utterance": "차는 하린이랑 도윤만, 나머지는 다 같이",
+  "me": "지우",
+  "members": [
+    { "id": "m1", "name": "지우" },
+    { "id": "m2", "name": "하린" },
+    { "id": "m3", "name": "도윤" },
+    { "id": "m4", "name": "서준" }
+  ],
+  "expected": {
+    "currency": "TRY",
+    "total": 356000,
+    "lines": [
+      { "name": "TESTİ KEBABI", "qty": 4, "total": 260000 },
+      { "name": "MEZE TABAĞI", "qty": 2, "total": 56000 },
+      { "name": "AYRAN", "qty": 4, "total": 24000 },
+      { "name": "ÇAY", "qty": 4, "total": 16000 }
+    ],
+    "splits": [{ "lineIndex": 3, "memberIds": ["m2", "m3"] }]
+  }
+}

@@ -21,5 +21,9 @@
   "devDependencies": {
     "concurrently": "^10.0.6",
     "oxlint": "^1.91.0"
+  },
+  "dependencies": {
+    "@h290/api": "*",
+    "hono": "^4.13.16"
   }
 }
