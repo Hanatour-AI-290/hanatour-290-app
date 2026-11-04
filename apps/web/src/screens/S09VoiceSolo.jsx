@@ -1,9 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
 import { getJson, postJson } from '../api.js'
 import { IMG } from '../demo.js'
-import { ME, MEMBERS, SAMPLE_SMS } from '../sample.js'
+import { ME, MEMBERS, SAMPLE_RESULT, SAMPLE_SMS } from '../sample.js'
 import { lira } from '../ui.jsx'
+import { labelOf } from './S0_2Estimate.jsx'
 import './S09VoiceSolo.css'
+
+/**
+ * 아직 기록 안 한 예정 항목 (상품 분석 결과, 없으면 시연 상품). /api/match/plan 의 items 모양으로.
+ * 모르는 통화(OTHER)는 금액 비교에서 빼게 null 로 둔다
+ */
+function openPlan(state) {
+  const done = new Set(state.planDone ?? [])
+  return (state.estimate?.items ?? SAMPLE_RESULT.items)
+    .map((it, idx) => ({ idx, name: it.name, aliases: it.aliases ?? [], category: it.category, amount: it.amount ?? null, currency: it.currency && it.currency !== 'OTHER' ? it.currency : null }))
+    .filter((it) => !done.has(it.idx))
+}
+
+/** 기록이 예정 항목 중 하나인지 묻는다 (ML 임베딩 + 규칙, 애매하면 서버가 Claude 에게). 후보 없음 · 실패면 null */
+async function findPlan(got, items) {
+  if (!items.length || !got.name) return null
+  const r = await postJson('/api/match/plan', {
+    record: { text: got.name, amount: got.amount, currency: got.currency, people: Math.max(1, got.people.length) },
+    items: items.map(({ category: _c, ...it }) => it),
+  })
+  const c = r?.candidates?.[0]
+  const it = c && items.find((x) => x.idx === c.idx)
+  return it ? { idx: it.idx, name: it.name, category: labelOf(it.category), amountMatch: Boolean(c.amountMatch) } : null
+}
 
 // 9 혼자 쓴 돈은 말로 (지우의 폰). 말 한 줄 · 카드 문자 → AI 가 읽은 지출 하나 → 가계부에 적기 (FR-015·016, AVL-003)
 const SAID = '기념품 300리라 현금'
@@ -45,8 +69,9 @@ async function krwOf(amount, cur) {
 
 const whoOf = (people) => (people.length > 1 ? `${people.join(', ')} ${people.length}명` : '나 혼자')
 
-export default function VoiceSolo({ next, set, toast }) {
+export default function VoiceSolo({ next, set, toast, state }) {
   const [item, setItem] = useState(DESIGN)
+  const [plan, setPlan] = useState(null) // 예정 항목 후보 { idx, name, category, amountMatch, ok }. ok = "맞아요" 누름
   const [said, setSaid] = useState(SAID) // 위 말 문구 (누르면 고친다). 카드 문자로 적었으면 null
   const [draft, setDraft] = useState(SAID)
   const [editing, setEditing] = useState(false)
@@ -77,6 +102,11 @@ export default function VoiceSolo({ next, set, toast }) {
       const got = fromRecord(r, input)
       setItem(got)
       setTyped('')
+      setPlan(null)
+      // 일정에 있던 지출인지 (카드 문자 "GOREME BALLOONS EUR 320" → "카파도키아 열기구 투어"). 실패해도 기록은 그대로 (후보 없음)
+      findPlan(got, openPlan(state))
+        .then((p) => { if (alive.current && my === seq.current) setPlan(p) })
+        .catch(() => { /* 후보 없이 */ })
       if (got.amount == null) {
         toast(r?.currency === 'OTHER' && typeof r?.amount === 'number' ? `${r.amount} (모르는 통화) · 리라로 바꾼 금액을 적어 주세요` : '금액을 못 읽었어요 · 직접 적어 주세요')
         requestAnimationFrame(() => amtRef.current?.focus())
@@ -91,6 +121,7 @@ export default function VoiceSolo({ next, set, toast }) {
         // 다른 칸도 앞 결과를 남기지 않는다: 이름은 말한 그대로, 분류는 기타
         const words = input.kind === 'sms' ? '카드 결제' : input.text.slice(0, 20)
         setItem({ ...fromRecord(null, input), name: words })
+        setPlan(null)
         setTyped('')
         requestAnimationFrame(() => amtRef.current?.focus())
         toast(`${e?.status ? e.message : '서버에 연결하지 못했어요'} · 직접 적어 주세요`)
@@ -157,7 +188,13 @@ export default function VoiceSolo({ next, set, toast }) {
       amount = Number(typed.replace(/,/g, ''))
       if (!(amount > 0)) { toast('얼마인지 적어 주세요'); amtRef.current?.focus(); return }
     }
-    set({ solo: { name: item.name, amount, currency: item.currency, method: item.method, category: item.category, krw: manual ? '' : item.krw } })
+    const linked = plan?.ok ? plan : null
+    set({
+      solo: { name: item.name, amount, currency: item.currency, method: item.method, category: linked?.category ?? item.category, krw: manual ? '' : item.krw, ...(linked ? { plan: { idx: linked.idx, name: linked.name } } : {}) },
+      // "맞아요" 누른 예정 항목은 했다로 (다음 기록의 후보에서 빠진다)
+      ...(linked ? { planDone: [...new Set([...(state.planDone ?? []), linked.idx])] } : {}),
+    })
+    if (linked) toast(`“${linked.name}” 일정에 기록했어요`)
     next()
   }
 
@@ -182,7 +219,7 @@ export default function VoiceSolo({ next, set, toast }) {
     ['얼마', amountRow],
     ['무엇', item.name],
     ['어떻게', item.method],
-    ['분류', <span className="solo-chip">{item.category}</span>],
+    ['분류', <span key="chip" className="solo-chip">{plan?.ok ? plan.category : item.category}</span>],
     ['누구', whoOf(item.people)],
   ]
 
@@ -217,6 +254,26 @@ export default function VoiceSolo({ next, set, toast }) {
           {!editing && <button type="button" className="solo-sms" onClick={() => setSheet(true)}>카드 문자</button>}
         </div>
         <h1 className="solo-title">이렇게 적을까요?</h1>
+
+        {plan && (
+          <div className={`solo-plan rise${plan.ok ? ' ok' : ''}`} role="group" aria-label="예정 지출 연결">
+            {plan.ok ? (
+              <>
+                <p className="solo-plan-q"><span className="solo-plan-tick pop"><img src={IMG('s04-check.svg')} width="12" height="12" alt="" /></span>“{plan.name}” 일정으로 적어요</p>
+                <button type="button" className="solo-plan-undo" onClick={() => setPlan({ ...plan, ok: false })}>되돌리기</button>
+              </>
+            ) : (
+              <>
+                <p className="solo-plan-q">“{plan.name}” 예정 지출인가요?</p>
+                <p className="solo-plan-why">일정의 {plan.category}과 이름이 비슷해요{plan.amountMatch ? ' · 금액도 같아요' : ''}</p>
+                <div className="solo-plan-act">
+                  <button type="button" onClick={() => setPlan(null)}>아니에요</button>
+                  <button type="button" className="yes" onClick={() => setPlan({ ...plan, ok: true })}>맞아요</button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         <ul className={`solo-list stagger${busy ? ' busy' : ''}`} aria-busy={busy}>
           {rows.map(([k, v]) => (

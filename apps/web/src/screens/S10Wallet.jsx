@@ -10,7 +10,7 @@ export default function Wallet({ state, tab, go, toast }) {
   const solo = state.solo ?? { name: '기념품', amount: 300, method: '현금', category: '쇼핑', krw: '약 1만 원' }
   const rows = [
     { img: IMG('dinner.png'), name: '마가라 레스토랑 저녁', sub: '같이 씀, 내 몫', amount: -510, currency: 'TRY', krw: '약 1.7만 원' },
-    { img: IMG('souvenir.png'), name: solo.name, sub: `${solo.method}, ${solo.category}`, amount: -solo.amount, currency: solo.currency ?? 'TRY', krw: solo.krw },
+    { img: IMG('souvenir.png'), name: solo.name, sub: `${solo.method}, ${solo.category}${solo.plan ? ' · 일정에 기록' : ''}`, amount: -solo.amount, currency: solo.currency ?? 'TRY', krw: solo.krw },
   ]
   // 하루 생활비는 리라 기준이라 리라로 쓴 돈만 더한다
   const spent = rows.filter((r) => r.currency === 'TRY').reduce((a, r) => a - r.amount, 0)
