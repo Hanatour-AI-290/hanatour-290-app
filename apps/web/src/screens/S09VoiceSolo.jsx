@@ -19,8 +19,10 @@ const PAID_DATE = '2026-11-05' // DAY 3 (sample.js: DAY 1 = 11/03). 미래 날�
  */
 function fromRecord(r, input) {
   const sms = input.kind === 'sms'
-  const amount = typeof r?.amount === 'number' && r.amount > 0 ? r.amount : null
-  const currency = r?.currency && r.currency !== 'OTHER' ? r.currency : 'TRY'
+  // 앱이 모르는 통화(스위스 프랑 등, OTHER)면 리라로 바꿔 적지 않고 금액을 직접 적게 한다 (지갑은 리라 기준)
+  const known = r?.currency && r.currency !== 'OTHER'
+  const amount = known && typeof r?.amount === 'number' && r.amount > 0 ? r.amount : null
+  const currency = known ? r.currency : 'TRY'
   const people = Array.isArray(r?.people) ? r.people.filter((p) => MEMBERS.includes(p)) : []
   return {
     name: r?.name || (sms ? '카드 결제' : '기타'),
@@ -60,17 +62,23 @@ export default function VoiceSolo({ next, set, toast }) {
   useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
 
   /** /api/record 를 불러 행을 채운다. 나중에 보낸 요청 결과만 쓴다 */
-  async function record(input, { quiet = false } = {}) {
+  async function record(input, { quiet = false, onRefund } = {}) {
     const my = ++seq.current
     setBusy(true)
     try {
       const r = await postJson('/api/record', { ...input, members: MEMBERS, me: ME })
       if (!alive.current || my !== seq.current) return
+      // 카드 승인 취소 · 환불 문자는 새 지출이 아니다 → 적지 않고 알린다
+      if (r?.refund) {
+        toast('결제 취소 문자예요 · 지출로 적지 않았어요')
+        onRefund?.()
+        return
+      }
       const got = fromRecord(r, input)
       setItem(got)
       setTyped('')
       if (got.amount == null) {
-        toast('금액을 못 읽었어요 · 직접 적어 주세요')
+        toast(r?.currency === 'OTHER' && typeof r?.amount === 'number' ? `${r.amount} (모르는 통화) · 리라로 바꾼 금액을 적어 주세요` : '금액을 못 읽었어요 · 직접 적어 주세요')
         requestAnimationFrame(() => amtRef.current?.focus())
       }
       krwOf(got.amount, got.currency)
@@ -134,8 +142,10 @@ export default function VoiceSolo({ next, set, toast }) {
     const t = sms.trim()
     if (!t) return
     setSheet(false)
+    const before = said
     setSaid(null)
-    record({ text: t, kind: 'sms' })
+    // 취소 문자면 기록이 그대로이니 위 문구도 되돌린다
+    record({ text: t, kind: 'sms' }, { onRefund: () => setSaid(before) })
   }
 
   const manual = item.amount == null
