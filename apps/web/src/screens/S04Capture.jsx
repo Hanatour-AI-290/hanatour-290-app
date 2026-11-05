@@ -9,6 +9,12 @@ import './S04Capture.css'
 const RECEIPT = IMG('s04-receipt.jpg')
 const WAVE = [6, 12, 18, 10, 22, 14, 8, 16, 24, 12, 6, 14, 20, 10, 6] // 디자인 파형 높이 (px), 뒤에 흐린 막대 3개
 const TIMEOUT = 25000 // 운영 서버에서 분석이 20초 가까이 걸린다 (11/4 측정 18.7초)
+// ms 안에 끝나지 않으면 '시간 초과'로 실패. 끝나면 타이머를 지운다
+function withTimeout(promise, ms) {
+  let timer
+  const late = new Promise((_, no) => { timer = setTimeout(() => no(new Error('시간 초과')), ms) })
+  return Promise.race([promise, late]).finally(() => clearTimeout(timer))
+}
 
 /** 큰 사진은 긴 변 1400px JPEG 로 줄인다 (API 한도 3MB) */
 async function shrink(blob) {
@@ -71,7 +77,6 @@ export default function Capture({ next, prev, toast, state, set }) {
     if (editing) endEdit()
     setBusy(true)
     let dinner = null
-    let timer
     try {
       const image = photo ? await shrink(photo.file).catch(() => photo.file) : await (await fetch(RECEIPT)).blob()
       const form = new FormData()
@@ -79,10 +84,8 @@ export default function Capture({ next, prev, toast, state, set }) {
       form.set('utterance', (voice.replace(/\s+/g, ' ').trim() || DINNER.voice).slice(0, 500))
       form.set('members', JSON.stringify(ROOM))
       form.set('me', '지우')
-      const timeout = new Promise((_, no) => { timer = setTimeout(() => no(new Error('시간 초과')), TIMEOUT) })
-      dinner = await Promise.race([postForm('/api/trips/t1/receipts/analyze', form), timeout])
+      dinner = await withTimeout(postForm('/api/trips/t1/receipts/analyze', form), TIMEOUT)
     } catch (e) {
-      clearTimeout(timer)
       if (!alive.current) return
       // 직접 찍은 사진을 못 읽었으면(영수증이 아닌 사진 422, 서버 오류, 시간 초과) 예시 영수증 결과를 보여 주지 않는다 → 다시 찍기 (AVL-003, R-25)
       if (photo) {
@@ -91,8 +94,6 @@ export default function Capture({ next, prev, toast, state, set }) {
         return
       }
       dinner = null // 시연 영수증: 501 · 503 · 시간 초과 → 다음 화면은 디자인 예시 값(DINNER)으로 (시연이 멈추지 않게)
-    } finally {
-      clearTimeout(timer)
     }
     if (!alive.current) return
     set({ dinner })

@@ -3,7 +3,7 @@ import { postJson } from '../api.js'
 import { IMG } from '../demo.js'
 import { SAMPLE, SAMPLE_RESULT } from '../sample.js'
 import { Back, Cta } from '../ui.jsx'
-import { labelOf } from './S0_2Estimate.jsx'
+import { labelOf } from '../format.js'
 import './S0_1Product.css'
 
 // 0-1 여행 전: 상품 불러오기 (지우의 폰). 상품 문구 → /api/estimate → 0-2 진짜 총비용

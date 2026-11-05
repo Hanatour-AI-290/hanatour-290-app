@@ -1,5 +1,6 @@
 import { DINNER, IMG, TRIP5 } from '../demo.js'
-import { CountUp, TabBar, lira } from '../ui.jsx'
+import { CountUp, TabBar } from '../ui.jsx'
+import { lira } from '../format.js'
 import './SHome.css'
 
 // 홈 · 여행 중 첫 화면 (Figma 89:74). 여행 중에는 여기서 각 화면으로 간다

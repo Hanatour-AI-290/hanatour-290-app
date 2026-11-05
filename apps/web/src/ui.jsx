@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { IMG } from './demo.js'
+import { lira } from './format.js'
 
 /** 위 내용 + 아래 버튼 뼈대. foot 이 없으면 버튼 줄을 그리지 않는다 */
 export function Screen({ className = '', body, foot, children, bodyClass = '' }) {
@@ -48,12 +49,10 @@ export function TabBar({ tab, go }) {
   )
 }
 
-export const lira = (n) => n.toLocaleString('ko-KR')
-
 const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** 금액이 0(또는 직전 값)에서 목표까지 부드럽게 올라간다. 값이 바뀌면 이어서 움직인다 */
-export function useCountUp(to, { ms = 900, delay = 150 } = {}) {
+function useCountUp(to, { ms = 900, delay = 150 } = {}) {
   const [v, setV] = useState(0)
   const from = useRef(0)
   useEffect(() => {

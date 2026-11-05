@@ -1,5 +1,6 @@
 import { DINNER, IMG, MY_WALLET, TRIP5 } from '../demo.js'
-import { CountUp, lira } from '../ui.jsx'
+import { CountUp } from '../ui.jsx'
+import { lira } from '../format.js'
 import './S11DayClose.css'
 
 // 11 하루 마감: 곧 모자라요 (지우의 폰, DAY 3 밤 10시)

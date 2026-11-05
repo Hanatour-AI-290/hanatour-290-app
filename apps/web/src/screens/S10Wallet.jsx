@@ -1,5 +1,6 @@
 import { IMG, MY_WALLET, PEOPLE, TRIP5 } from '../demo.js'
-import { Avatar, CountUp, TabBar, lira } from '../ui.jsx'
+import { Avatar, CountUp, TabBar } from '../ui.jsx'
+import { lira } from '../format.js'
 import './S10Wallet.css'
 
 const UNIT = { TRY: '리라', EUR: '유로', KRW: '원', USD: '달러', JPY: '엔' }
