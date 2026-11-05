@@ -95,6 +95,7 @@
 AI는 **사진과 말을 읽어 구조화된 값으로 바꾸는 일**만 합니다. 나누기 · 환산 · 차감 · 검사는 모두 `packages/shared`의 순수 함수가 하고, 같은 입력이면 늘 같은 답이 나옵니다. AI가 읽은 값이 규칙 검사에 걸리면 틀린 점을 알려 주고 **한 번만** 다시 읽게 하고, 그래도 안 맞으면 사람에게 묻습니다.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
 flowchart TB
     A["📷 영수증 사진"] --> R["readReceipt<br/>줄 · 수량 · 금액 · 세금"]
     R --> C1{"줄 합 = 합계?"}
@@ -144,6 +145,7 @@ flowchart TB
 ### 예정 지출 연결은 어떻게 동작하나
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
 flowchart TB
     REC["기록: GOREME BALLOONS €320"] --> N["Claude가 읽은 이름<br/>괴레메 열기구 투어"]
     PLAN["일정의 예정 항목<br/>+ Claude가 만든 별칭"] --> E
@@ -218,6 +220,7 @@ flowchart TB
 | `docs` | API 계약 · 모델 선정 · 협업 규칙 · 진행보고서 · README 이미지 | 모두 |
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
 flowchart TB
     WEB["📱 apps/web<br/>React · 상태는 기기에 저장"] -- "fetch /api" --> API["▲ apps/api on Vercel<br/>Hono · /api/*"]
     API --> AI["packages/ai<br/>Claude 호출 · e5 임베딩"]
