@@ -95,17 +95,17 @@
 AI는 **사진과 말을 읽어 구조화된 값으로 바꾸는 일**만 합니다. 나누기 · 환산 · 차감 · 검사는 모두 `packages/shared`의 순수 함수가 하고, 같은 입력이면 늘 같은 답이 나옵니다. AI가 읽은 값이 규칙 검사에 걸리면 틀린 점을 알려 주고 **한 번만** 다시 읽게 하고, 그래도 안 맞으면 사람에게 묻습니다.
 
 ```mermaid
-flowchart LR
-    A["📷 영수증 사진"] --> R["readReceipt<br/><sub>줄 · 수량 · 금액 · 세금</sub>"]
-    V["🎙️ 한마디<br/><sub>맥주는 하린이랑 도윤</sub>"] --> S
-    R --> C1{"validate<br/><sub>줄 합 = 합계?</sub>"}
-    C1 -- "틀림 · 1회" --> R
-    C1 -- "통과" --> S["assignLines<br/><sub>줄마다 나눌 사람 · 결제자</sub>"]
-    S --> C2{"validate<br/><sub>결제 금액 합 · 사람 확인</sub>"}
-    C2 -- "틀림 · 1회" --> S
+flowchart TB
+    A["📷 영수증 사진"] --> R["readReceipt<br/>줄 · 수량 · 금액 · 세금"]
+    R --> C1{"줄 합 = 합계?"}
+    C1 -- "틀림 → 1회 다시" --> R
+    C1 -- "통과" --> S["assignLines<br/>줄마다 나눌 사람 · 결제자"]
+    V["🎙️ 맥주는 하린이랑 도윤"] --> S
+    S --> C2{"결제 금액 · 사람 검사"}
+    C2 -- "틀림 → 1회 다시" --> S
     C2 -- "통과" --> OK["✅ 이렇게 나눌까요?"]
     C2 -- "그래도 틀림" --> Q["❓ 사용자에게 질문"]
-    OK --> P["settle<br/><sub>사람별 몫 · 통화별 정산</sub>"]
+    OK --> P["settle<br/>사람별 몫 · 통화별 정산"]
 
     classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
     classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
@@ -115,7 +115,7 @@ flowchart LR
     class A,V,OK,Q io
 ```
 
-<sub>보라색 = Claude, 노란색 = 서버 규칙. 코드: `packages/ai/src/pipeline.js`, `validate.js`, `packages/shared/src/settle.js`</sub>
+<sub>보라색 = Claude, 노란색 = 서버 규칙, 연한 색 = 입력 · 결과. 코드: `packages/ai/src/pipeline.js`, `validate.js`, `packages/shared/src/settle.js`</sub>
 
 <br />
 
@@ -144,15 +144,15 @@ flowchart LR
 ### 예정 지출 연결은 어떻게 동작하나
 
 ```mermaid
-flowchart LR
-    REC["기록<br/><sub>GOREME BALLOONS €320</sub>"] --> N["Claude가 읽은 이름<br/><sub>괴레메 열기구 투어</sub>"]
-    PLAN["일정의 예정 항목<br/><sub>+ Claude가 만든 별칭</sub>"] --> E
-    N --> E["e5 임베딩 유사도<br/><sub>흔한 말 빼고</sub>"]
-    E --> RULE{"상대 점수 규칙<br/><sub>항목 평균 대비 · 글자 겹침 · 금액</sub>"}
+flowchart TB
+    REC["기록: GOREME BALLOONS €320"] --> N["Claude가 읽은 이름<br/>괴레메 열기구 투어"]
+    PLAN["일정의 예정 항목<br/>+ Claude가 만든 별칭"] --> E
+    N --> E["e5 임베딩 유사도<br/>흔한 말은 빼고"]
+    E --> RULE{"상대 점수 규칙<br/>평균 대비 · 글자 겹침 · 금액"}
     RULE -- "확실" --> ONE["후보 1개"]
-    RULE -- "애매 (약 40%)" --> RR["Claude 재순위<br/><sub>2~3개 중 고르기, 모르면 null</sub>"]
+    RULE -- "애매 · 약 40%" --> RR["Claude 재순위<br/>2~3개 중 고르기, 모르면 null"]
     RR --> ONE
-    ONE --> U["👆 사용자가 '맞아요'"]
+    ONE --> U["👆 사용자가 맞아요"]
 
     classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
     classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
@@ -200,53 +200,31 @@ flowchart LR
 | 말 · 카드 문자 → 지출 | 2.2~2.7초 |
 | 예정 지출 연결 (규칙으로 끝날 때 / Claude 재순위) | 0.4초 / 1.9초 |
 | 정산 · 환율 | 0.3~1.1초 |
-| 임베딩 모델 첫 로드 (새 서버) | 약 6초 — 앱을 열 때 `GET /api/match/warm`으로 미리 불러 둠 |
+| 임베딩 모델 첫 로드 (새 서버) | 약 6초 |
+
+<sub>새 서버의 첫 로드는 앱을 열 때 `GET /api/match/warm` 으로 미리 해 두어, 보통은 사용자가 기다리지 않습니다</sub>
 
 <br />
 
 ## 구조
 
-```
-hanatour-290-app/
-├─ apps/
-│  ├─ web/            React 19 + Vite 8 · v5 Figma 화면 16개
-│  │  └─ src/
-│  │     ├─ screens/  화면 하나 = 파일 하나 (S00Splash … S12TripReport)
-│  │     ├─ api.js    서버 호출 · 금액 단위 변환
-│  │     ├─ dinner.js 영수증 결과 → 화면 모양 · API Expense
-│  │     └─ format.js 금액 · 분류 표기
-│  └─ api/            Hono 4 · 로컬은 Node 서버, 배포는 Vercel 함수 (같은 앱)
-│     └─ src/
-│        ├─ routes/   estimate · record · receipts · match · settle · budget · fx …
-│        └─ lib/      환율 · 요청 수 제한 · 로그 · 키 없을 때 배포본으로 넘기기
-├─ packages/
-│  ├─ shared/         zod 스키마 · 정산 · 예산 · 연결 규칙 (AI 없음, 순수 함수)
-│  └─ ai/             Claude 호출 · 임베딩 · 평가 세트
-│     ├─ src/
-│     └─ eval/        영수증 · 문장 · 예정 지출 연결 정확도 측정
-├─ api/index.js       Vercel 함수 진입점
-└─ docs/              API 계약 · 모델 선정 · 협업 규칙 · 진행보고서
-```
+| 폴더 | 내용 | 담당 브랜치 |
+| --- | --- | :---: |
+| `apps/web` | React 19 + Vite 8 · v5 Figma 화면 16개. `screens/` 화면 하나 = 파일 하나, `api.js` 서버 호출, `dinner.js` 영수증 결과 → 화면 모양, `format.js` 금액 · 분류 표기 | `feat/fe` |
+| `apps/api` | Hono 4. 로컬은 Node 서버, 배포는 Vercel 함수로 같은 앱을 씀. `routes/` 기능별 API, `lib/` 환율 · 요청 수 제한 · 로그 · 배포본으로 넘기기 | `feat/be` |
+| `packages/shared` | zod 스키마, 정산 · 예산 · 연결 규칙. AI 없는 순수 함수 | `feat/be` |
+| `packages/ai` | Claude 호출, e5 임베딩, `eval/` 정확도 측정 세트 | `feat/ai` |
+| `api/index.js` | Vercel 함수 진입점 | |
+| `docs` | API 계약 · 모델 선정 · 협업 규칙 · 진행보고서 · README 이미지 | 모두 |
 
 ```mermaid
-flowchart LR
-    subgraph Phone["📱 휴대폰 브라우저"]
-        WEB["apps/web<br/><sub>React · 상태는 기기에 저장</sub>"]
-    end
-    subgraph Vercel["▲ Vercel"]
-        API["apps/api<br/><sub>Hono · /api/*</sub>"]
-        AI["packages/ai<br/><sub>Claude · e5 임베딩</sub>"]
-        SH["packages/shared<br/><sub>정산 · 검사 규칙</sub>"]
-    end
-    CL["Anthropic API<br/><sub>claude-opus-5-5</sub>"]
-    FX["Frankfurter<br/><sub>유럽중앙은행 환율</sub>"]
-
-    WEB -- "fetch /api" --> API
-    API --> AI
-    API --> SH
+flowchart TB
+    WEB["📱 apps/web<br/>React · 상태는 기기에 저장"] -- "fetch /api" --> API["▲ apps/api on Vercel<br/>Hono · /api/*"]
+    API --> AI["packages/ai<br/>Claude 호출 · e5 임베딩"]
+    API --> SH["packages/shared<br/>정산 · 검사 규칙"]
     AI --> SH
-    AI --> CL
-    API --> FX
+    AI --> CL["Anthropic API<br/>claude-opus-5-5"]
+    API --> FX["Frankfurter<br/>유럽중앙은행 환율"]
 
     classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
     classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
