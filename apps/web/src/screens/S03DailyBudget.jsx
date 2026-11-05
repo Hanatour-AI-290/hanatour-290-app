@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IMG, TRIP5 } from '../demo.js'
-import { Back, CountUp, Screen, Cta, lira } from '../ui.jsx'
+import { Back, CountUp, Screen, Cta } from '../ui.jsx'
+import { lira } from '../format.js'
 import './S03DailyBudget.css'
 
 // 3 여행 전: 하루 생활비 정하기 (지우의 폰). 일정 속 날짜·장소·추가 비용은 디자인 예시 값

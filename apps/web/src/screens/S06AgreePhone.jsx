@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { DINNER, IMG, PEOPLE } from '../demo.js'
-import { Avatar, CountUp, lira } from '../ui.jsx'
-import { dinnerOf } from './S05SplitConfirm.jsx'
+import { Avatar, CountUp } from '../ui.jsx'
+import { lira } from '../format.js'
+import { dinnerOf } from '../dinner.js'
 import './S06AgreePhone.css'
 
 const ME = '하린'

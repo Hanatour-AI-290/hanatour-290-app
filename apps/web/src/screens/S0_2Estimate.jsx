@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { IMG, TRIP5 } from '../demo.js'
 import { SAMPLE_RESULT } from '../sample.js'
 import { CountUp, Cta } from '../ui.jsx'
+import { labelOf } from '../format.js'
 import './S0_2Estimate.css'
 
 // 0-2 여행 전: 진짜 총비용 예상 (지우의 폰)
@@ -20,13 +21,6 @@ const D_LOCAL = [
 const D_BAR = [122, 59, 59, 29, 10, 6]
 const BASE_COLOR = '#3a1c82'
 const COLORS = ['#5e2bb8', '#8a63db', '#b9a2ee', '#f4b740', '#d9d3e8', '#c9b8f2', '#e6dcfb']
-
-/** 상품 분석 분류 → 화면 이름. chip 이면 0-1 칩 표기 (불포함 식사 = 자유식) */
-export function labelOf(category, chip = false) {
-  if (category === '가이드·기사 경비') return '가이드 경비'
-  if (category === '불포함 식사') return chip ? '자유식' : '식비'
-  return category || '기타'
-}
 
 const SYM = { EUR: '€', USD: '$', JPY: '¥', TRY: '₺', GBP: '£' }
 const man = (krw) => Math.round(krw / 10000)

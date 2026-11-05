@@ -1,6 +1,6 @@
 import { DINNER, IMG, PEOPLE, TRIP5 } from '../demo.js'
-import { lira } from '../ui.jsx'
-import { dinnerOf } from './S05SplitConfirm.jsx'
+import { lira } from '../format.js'
+import { dinnerOf } from '../dinner.js'
 import './S07SettleRoom.css'
 
 const ALL = ['지우', '하린', '도윤', '서준']

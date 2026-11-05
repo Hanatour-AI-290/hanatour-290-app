@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { getJson, postJson } from '../api.js'
 import { IMG } from '../demo.js'
 import { ME, MEMBERS, SAMPLE_RESULT, SAMPLE_SMS } from '../sample.js'
-import { lira } from '../ui.jsx'
-import { labelOf } from './S0_2Estimate.jsx'
+import { labelOf, lira } from '../format.js'
 import './S09VoiceSolo.css'
 
 /**
