@@ -94,29 +94,9 @@
 
 AI는 **사진과 말을 읽어 구조화된 값으로 바꾸는 일**만 합니다. 나누기 · 환산 · 차감 · 검사는 모두 `packages/shared`의 순수 함수가 하고, 같은 입력이면 늘 같은 답이 나옵니다. AI가 읽은 값이 규칙 검사에 걸리면 틀린 점을 알려 주고 **한 번만** 다시 읽게 하고, 그래도 안 맞으면 사람에게 묻습니다.
 
-```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
-flowchart TB
-    A["📷 영수증 사진"] --> R["readReceipt<br/>줄 · 수량 · 금액 · 세금"]
-    R --> C1{"줄 합 = 합계?"}
-    C1 -- "틀림 → 1회 다시" --> R
-    C1 -- "통과" --> S["assignLines<br/>줄마다 나눌 사람 · 결제자"]
-    V["🎙️ 맥주는 하린이랑 도윤"] --> S
-    S --> C2{"결제 금액 · 사람 검사"}
-    C2 -- "틀림 → 1회 다시" --> S
-    C2 -- "통과" --> OK["✅ 이렇게 나눌까요?"]
-    C2 -- "그래도 틀림" --> Q["❓ 사용자에게 질문"]
-    OK --> P["settle<br/>사람별 몫 · 통화별 정산"]
+<p align="center"><img src="docs/readme/diagram-pipeline.webp" width="460" alt="영수증 사진 → readReceipt → 줄 합 검사 → assignLines → 결제 금액 검사 → 이렇게 나눌까요? → settle" /></p>
 
-    classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
-    classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
-    classDef io fill:#f5f0fe,stroke:#c9b8f2,color:#1d1530
-    class R,S ai
-    class C1,C2,P rule
-    class A,V,OK,Q io
-```
-
-<sub>보라색 = Claude, 노란색 = 서버 규칙, 연한 색 = 입력 · 결과. 코드: `packages/ai/src/pipeline.js`, `validate.js`, `packages/shared/src/settle.js`</sub>
+<sub>코드: `packages/ai/src/pipeline.js`, `validate.js`, `packages/shared/src/settle.js`</sub>
 
 <br />
 
@@ -144,31 +124,15 @@ flowchart TB
 
 ### 예정 지출 연결은 어떻게 동작하나
 
-```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
-flowchart TB
-    REC["기록: GOREME BALLOONS €320"] --> N["Claude가 읽은 이름<br/>괴레메 열기구 투어"]
-    PLAN["일정의 예정 항목<br/>+ Claude가 만든 별칭"] --> E
-    N --> E["e5 임베딩 유사도<br/>흔한 말은 빼고"]
-    E --> RULE{"상대 점수 규칙<br/>평균 대비 · 글자 겹침 · 금액"}
-    RULE -- "확실" --> ONE["후보 1개"]
-    RULE -- "애매 · 약 40%" --> RR["Claude 재순위<br/>2~3개 중 고르기, 모르면 null"]
-    RR --> ONE
-    ONE --> U["👆 사용자가 맞아요"]
-
-    classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
-    classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
-    classDef io fill:#f5f0fe,stroke:#c9b8f2,color:#1d1530
-    class N,RR ai
-    class E,RULE rule
-    class REC,PLAN,ONE,U io
-```
+<p align="center"><img src="docs/readme/diagram-plan-match.webp" width="460" alt="기록 이름과 예정 항목을 e5 임베딩으로 비교, 규칙이 애매하면 Claude 재순위, 마지막은 사용자가 맞아요" /></p>
 
 - 이 모델은 관계없는 항목끼리도 유사도가 0.77 안팎이라, 고정 문턱 대신 **같은 상품 항목 평균보다 얼마나 높은가**를 봅니다 (항목 5개 이상일 때).
 - 여러 문장을 한 번에 넣으면 길이 맞춤 때문에 값이 최대 0.003 흔들려서, 문장을 하나씩 계산하고 최근 3,000개를 기억합니다.
 - 연결은 언제나 **후보**일 뿐이고, 사용자가 눌러야 기록됩니다.
 
 자세한 근거는 [docs/모델선정.md](docs/모델선정.md)에 있습니다.
+
+<sub>그림 원본(mermaid): [docs/readme/diagrams](docs/readme/diagrams)</sub>
 
 <br />
 
@@ -219,23 +183,7 @@ flowchart TB
 | `api/index.js` | Vercel 함수 진입점 | |
 | `docs` | API 계약 · 모델 선정 · 협업 규칙 · 진행보고서 · README 이미지 | 모두 |
 
-```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 480}, "markdownAutoWrap": false}}%%
-flowchart TB
-    WEB["📱 apps/web<br/>React · 상태는 기기에 저장"] -- "fetch /api" --> API["▲ apps/api on Vercel<br/>Hono · /api/*"]
-    API --> AI["packages/ai<br/>Claude 호출 · e5 임베딩"]
-    API --> SH["packages/shared<br/>정산 · 검사 규칙"]
-    AI --> SH
-    AI --> CL["Anthropic API<br/>claude-opus-5-5"]
-    API --> FX["Frankfurter<br/>유럽중앙은행 환율"]
-
-    classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
-    classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
-    classDef io fill:#f5f0fe,stroke:#c9b8f2,color:#1d1530
-    class AI,CL ai
-    class SH rule
-    class WEB,API,FX io
-```
+<p align="center"><img src="docs/readme/diagram-architecture.webp" width="100%" alt="apps/web → apps/api(Vercel) → packages/ai · packages/shared, Anthropic API, Frankfurter 환율" /></p>
 
 `/settle*` · `/budget` · `/report`는 서버에 저장하지 않고 **보낸 데이터로 계산만** 합니다. 시연은 한 기기에서 하므로 지출 · 지갑 데이터는 화면이 들고 있습니다 (요구사항 AVL-004).
 
