@@ -174,7 +174,7 @@ AI는 **사진과 말을 읽어 구조화된 값으로 바꾸는 일**만 합니
 
 ## 구조
 
-| 폴더 | 내용 | 담당 브랜치 |
+| 폴더 | 내용 | 브랜치 |
 | --- | --- | :---: |
 | `apps/web` | React 19 + Vite 8 · v5 Figma 화면 16개. `screens/` 화면 하나 = 파일 하나, `api.js` 서버 호출, `dinner.js` 영수증 결과 → 화면 모양, `format.js` 금액 · 분류 표기 | `feat/fe` |
 | `apps/api` | Hono 4. 로컬은 Node 서버, 배포는 Vercel 함수로 같은 앱을 씀. `routes/` 기능별 API, `lib/` 환율 · 요청 수 제한 · 로그 · 배포본으로 넘기기 | `feat/be` |
