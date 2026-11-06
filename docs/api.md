@@ -22,7 +22,9 @@
 | POST   | `/trips`                            | 여행 만들기                              | 할 일  |
 | GET    | `/trips/:tripId/records`            | 지출 목록                                | 뼈대   |
 | POST   | `/trips/:tripId/records`            | 지출 저장                                | 할 일  |
-| POST   | `/trips/:tripId/receipts/analyze`   | 사진 + 말 → 줄 단위 · 배정 · 검증 결과  | 받는 쪽 완료 · AI 대기 (지금은 501) |
+| POST   | `/trips/:tripId/receipts/analyze`   | 사진 + 말 → 줄 단위 · 배정 · 검증 결과 (R-07~09) | 완료   |
+| POST   | `/match/plan`                       | 기록 ↔ 일정의 예정 항목 연결 후보        | 완료   |
+| GET    | `/match/warm`                       | 연결에 쓰는 임베딩 모델 미리 불러 두기   | 완료   |
 
 `/settle*` · `/budget` · `/report` 는 서버에 저장하지 않고 **보낸 데이터로 계산만** 한다.
 Vercel 함수는 요청마다 메모리가 비워질 수 있고, 시연은 한 기기에서 한다 (요구사항 AVL-004). 지출·지갑 데이터는 화면이 들고 있다.
@@ -47,7 +49,7 @@ QR 로 공개한 링크에서 API 키 비용이 커지지 않게 접속 기기(I
 
 | API | 한도 | 바꾸는 환경변수 |
 | --- | --- | --- |
-| Claude 를 부르는 `/estimate` · `/record` · `/trips/:tripId/receipts/*` | 분당 30회 | `AI_RATE_LIMIT` |
+| Claude 를 부르는 `/estimate` · `/record` · `/match/plan` · `/trips/:tripId/receipts/*` | 분당 30회 | `AI_RATE_LIMIT` |
 | 나머지 | 분당 300회 | `API_RATE_LIMIT` |
 
 서버 메모리에 세므로 Vercel 함수 인스턴스마다 따로 센다 (근사치).
