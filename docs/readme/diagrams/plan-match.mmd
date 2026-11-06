@@ -1,0 +1,16 @@
+flowchart TB
+    REC["기록: GOREME BALLOONS €320"] --> N["Claude가 읽은 이름<br/>괴레메 열기구 투어"]
+    PLAN["일정의 예정 항목<br/>+ Claude가 만든 별칭"] --> E
+    N --> E["e5 임베딩 유사도<br/>흔한 말은 빼고"]
+    E --> RULE{"상대 점수 규칙<br/>평균 대비 · 글자 겹침 · 금액"}
+    RULE -- "확실" --> ONE["후보 1개"]
+    RULE -- "애매 · 약 40%" --> RR["Claude 재순위<br/>2~3개 중 고르기, 모르면 null"]
+    RR --> ONE
+    ONE --> U["👆 사용자가 맞아요"]
+
+    classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
+    classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
+    classDef io fill:#f5f0fe,stroke:#c9b8f2,color:#1d1530
+    class N,RR ai
+    class E,RULE rule
+    class REC,PLAN,ONE,U io

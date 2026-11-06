@@ -1,0 +1,14 @@
+flowchart LR
+    WEB["📱 apps/web<br/>React · 상태는 기기에 저장"] -- "fetch /api" --> API["▲ apps/api on Vercel<br/>Hono · /api/*"]
+    API --> AI["packages/ai<br/>Claude 호출 · e5 임베딩"]
+    API --> SH["packages/shared<br/>정산 · 검사 규칙"]
+    AI --> SH
+    AI --> CL["Anthropic API<br/>claude-opus-5-5"]
+    API --> FX["Frankfurter<br/>유럽중앙은행 환율"]
+
+    classDef ai fill:#5e2bb8,stroke:#3a1c82,color:#fff
+    classDef rule fill:#f4b740,stroke:#c98f1c,color:#1d1530
+    classDef io fill:#f5f0fe,stroke:#c9b8f2,color:#1d1530
+    class AI,CL ai
+    class SH rule
+    class WEB,API,FX io
